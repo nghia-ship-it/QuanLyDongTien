@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background-color: #f3f4f6;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+/* Tuyệt chiêu Dark Mode */
+body {
+  transition: filter 0.3s ease, background-color 0.3s ease;
+}
+body.dark-theme {
+  filter: invert(0.92) hue-rotate(180deg);
+  background-color: #111;
+}
