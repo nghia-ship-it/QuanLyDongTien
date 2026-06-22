@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/nguonnhap';
+const API_URL = 'https://quanlydongtien.onrender.com/api/nguonnhap';
 
 export default function NguonNhap() {
   const [listGrouped, setListGrouped] = useState([]);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/doanhthu';
+const API_URL = 'https://quanlydongtien.onrender.com/api/doanhthu';
 
 export default function DoanhThu() {
   const [list, setList] = useState([]);

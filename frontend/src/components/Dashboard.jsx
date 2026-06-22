@@ -17,8 +17,8 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const resDT = await axios.get(`http://localhost:5000/api/doanhthu?thang=${thang}&nam=${nam}`);
-      const resNN = await axios.get(`http://localhost:5000/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`);
+      const resDT = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu?thang=${thang}&nam=${nam}`);
+      const resNN = await axios.get(`https://quanlydongtien.onrender.com/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`);
       
       const dtData = resDT.data;
       const nnData = resNN.data;
