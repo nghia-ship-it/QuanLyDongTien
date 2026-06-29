@@ -158,6 +158,44 @@ app.delete('/api/nguonnhap/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ==========================================
+// 5.API Webhook nhận biến động số dư từ SePay
+// ==========================================
+app.post('/api/webhook/sepay', async (req, res) => {
+    try {
+        const data = req.body;
+        
+        // SePay nó sẽ gửi cục data về, mình chỉ lấy giao dịch CỘNG TIỀN (transferType === 'in')
+        if (data && data.transferAmount > 0) {
+            
+            // Lấy ngày hiện tại theo giờ VN
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            const ngayNhap = `${dd}/${mm}/${yyyy}`;
+
+            // Tạo một bản ghi Doanh Thu mới
+            const dtMoi = new DoanhThu({
+                ngayNhap: ngayNhap,
+                tienMat: 0,
+                chuyenKhoan: data.transferAmount,
+                tongCong: data.transferAmount,
+                ghiChu: data.content // Lưu lại nội dung chuyển khoản để ba mẹ dễ đối soát
+            });
+
+            await dtMoi.save();
+            console.log(` TING TING! Vừa nhận ${data.transferAmount}đ. Nội dung: ${data.content}`);
+        }
+        
+        // Báo cho SePay biết là "Tao nhận được rồi, cảm ơn!"
+        res.status(200).json({ success: true, message: 'Webhook received' });
+    } catch (error) {
+        console.error('❌ Lỗi xử lý Webhook:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log('Server đang chạy ở cổng ' + PORT);
