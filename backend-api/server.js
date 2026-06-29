@@ -165,15 +165,21 @@ app.post('/api/webhook/sepay', async (req, res) => {
     try {
         const data = req.body;
         
-        // SePay nó sẽ gửi cục data về, mình chỉ lấy giao dịch CỘNG TIỀN (transferType === 'in')
+        // SePay nó sẽ gửi cục data về, mình chỉ lấy giao dịch CỘNG TIỀN
         if (data && data.transferAmount > 0) {
             
-            // Lấy ngày hiện tại theo giờ VN
+            // Lấy ngày giờ hiện tại chuẩn YYYY-MM-DD HH:mm:ss và ép về giờ Việt Nam (UTC+7)
             const today = new Date();
-            const dd = String(today.getDate()).padStart(2, '0');
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const yyyy = today.getFullYear();
-            const ngayNhap = `${dd}/${mm}/${yyyy}`;
+            today.setHours(today.getHours() + 7); 
+            
+            const yyyy = today.getUTCFullYear();
+            const mm = String(today.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(today.getUTCDate()).padStart(2, '0');
+            const hh = String(today.getUTCHours()).padStart(2, '0');
+            const min = String(today.getUTCMinutes()).padStart(2, '0');
+            const ss = String(today.getUTCSeconds()).padStart(2, '0');
+            
+            const ngayNhap = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
 
             // Tạo một bản ghi Doanh Thu mới
             const dtMoi = new DoanhThu({
@@ -181,11 +187,11 @@ app.post('/api/webhook/sepay', async (req, res) => {
                 tienMat: 0,
                 chuyenKhoan: data.transferAmount,
                 tongCong: data.transferAmount,
-                ghiChu: data.content // Lưu lại nội dung chuyển khoản để ba mẹ dễ đối soát
+                ghiChu: data.content 
             });
 
             await dtMoi.save();
-            console.log(` TING TING! Vừa nhận ${data.transferAmount}đ. Nội dung: ${data.content}`);
+            console.log(`🤑 TING TING! Vừa nhận ${data.transferAmount}đ. Nội dung: ${data.content}`);
         }
         
         // Báo cho SePay biết là "Tao nhận được rồi, cảm ơn!"
