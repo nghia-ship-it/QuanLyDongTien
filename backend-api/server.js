@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const khoHangRoute = require('./routes/khoHangRoute')
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,7 @@ const webhookRoute = require('./routes/webhookRoute');
 app.use('/api', authRoute);              // Sẽ chạy: /api/login, /api/register
 app.use('/api/doanhthu', doanhThuRoute); // Sẽ chạy: /api/doanhthu/...
 app.use('/api/nguonnhap', nguonNhapRoute); // Sẽ chạy: /api/nguonnhap/...
+app.use('/api/khohang' ,khoHangRoute); // Sẽ chạy : /api/khoHangRoute
 app.use('/api/webhook', webhookRoute);   // Sẽ chạy: /api/webhook/sepay
 
 // 4. CHẠY SERVER

@@ -30,4 +30,16 @@ const nguonNhapSchema = new mongoose.Schema({
 });
 const NguonNhap = mongoose.model('NguonNhap', nguonNhapSchema);
 
-module.exports = { User, DoanhThu, NguonNhap };
+//  KHO HÀNG 
+const khoHangSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    tenSanPham: { type: String, required: true },
+    soLuongTon: { type: Number, default: 0 },
+    donViTinh: { type: String, default: 'Cái' },
+    giaNhap: { type: Number, default: 0 },
+    giaBan: { type: Number, default: 0 },
+    ngayCapNhat: String
+});
+const KhoHang = mongoose.model('KhoHang', khoHangSchema);
+
+module.exports = { User, DoanhThu, NguonNhap, KhoHang };

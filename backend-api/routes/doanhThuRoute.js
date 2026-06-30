@@ -3,6 +3,25 @@ const router = express.Router();
 const { DoanhThu } = require('../models/Database');
 const { verifyToken } = require('../middleware/auth');
 
+// --- API NHẬP LIỆU HÀNG LOẠT (TỪ EXCEL) ---
+router.post('/bulk', verifyToken, async (req, res) => {
+    try {
+        const dataArray = req.body.data; // Frontend sẽ gửi mảng data lên đây
+        if (!dataArray || dataArray.length === 0) return res.status(400).json({ message: 'Không có dữ liệu!' });
+
+        // Gắn thêm userId vào từng dòng trước khi lưu
+        const dataToSave = dataArray.map(item => ({
+            ...item,
+            userId: req.user._id,
+            tongCong: (Number(item.tienMat) || 0) + (Number(item.chuyenKhoan) || 0)
+        }));
+
+        // insertMany là lệnh Mongo giúp lưu cả ngàn dòng trong 1 tích tắc
+        await DoanhThu.insertMany(dataToSave);
+        res.json({ success: true, message: `Đã nhập thành công ${dataToSave.length} dòng!` });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.get('/', verifyToken, async (req, res) => {
     try {
         const { thang, nam } = req.query;

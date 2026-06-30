@@ -3,7 +3,8 @@ import Auth from './components/Auth';
 import DoanhThu from './components/DoanhThu';
 import NguonNhap from './components/NguonNhap';
 import Dashboard from './components/Dashboard'; 
-import HuongDanSePay from './components/HuongDanSePay';
+import HuongDanSePay from './components/HuongDanSePay'; 
+import KhoHang from './components/KhoHang/KhoHang';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -84,6 +85,9 @@ export default function App() {
                 <button onClick={() => handleTabChange('doanhThu')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                   📈 Doanh Thu
                 </button>
+                <button onClick={() => handleTabChange('khoHang')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  📦 Kho Hàng
+                </button>
                 <button onClick={() => handleTabChange('huongDan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                   ⚙️ Tích hợp SePay
                 </button>
@@ -118,6 +122,9 @@ export default function App() {
               <button onClick={() => handleTabChange('doanhThu')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
                 📈 Doanh Thu
               </button>
+              <button onClick={() => handleTabChange('khoHang')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+                📦 Kho Hàng
+              </button>
               <button onClick={() => handleTabChange('huongDan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
                 ⚙️ Tích hợp SePay
               </button>
@@ -142,6 +149,7 @@ export default function App() {
         {currentTab === 'dashboard' && <Dashboard token={token} />}
         {currentTab === 'nguonNhap' && <NguonNhap token={token} />}
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}
+        {currentTab === 'khoHang'&& <KhoHang token={token}/>}
         {currentTab === 'huongDan' && <HuongDanSePay />}
       </main>
     </div>
