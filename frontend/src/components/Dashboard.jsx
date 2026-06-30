@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function Dashboard() {
+export default function Dashboard({ token }) { // <--- HỨNG TOKEN Ở ĐÂY NÈ
   const [thang, setThang] = useState(new Date().getMonth() + 1);
   const [nam, setNam] = useState(new Date().getFullYear());
   const [chartData, setChartData] = useState([]);
@@ -17,8 +17,15 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const resDT = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu?thang=${thang}&nam=${nam}`);
-      const resNN = await axios.get(`https://quanlydongtien.onrender.com/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`);
+      // ---> NHÉT TOKEN VÀO HEADER ĐỂ TRÌNH DIỆN API <---
+      const config = {
+        headers: {
+          'auth-token': token
+        }
+      };
+
+      const resDT = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu?thang=${thang}&nam=${nam}`, config);
+      const resNN = await axios.get(`https://quanlydongtien.onrender.com/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`, config);
       
       const dtData = resDT.data;
       const nnData = resNN.data;
@@ -56,7 +63,7 @@ export default function Dashboard() {
       }
       setChartData(arr);
     } catch (err) {
-      console.error("Lỗi tải dữ liệu Dashboard");
+      console.error("Lỗi tải dữ liệu Dashboard", err);
     }
   };
 

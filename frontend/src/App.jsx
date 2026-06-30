@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Login from './components/Login';
+import Auth from './components/Auth'; 
 import DoanhThu from './components/DoanhThu';
 import NguonNhap from './components/NguonNhap';
-import Dashboard from './components/Dashboard'; // Import Dashboard mới
+import Dashboard from './components/Dashboard'; 
 
 export default function App() {
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  // Thay isUnlocked bằng token
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [currentTab, setCurrentTab] = useState('dashboard');
   
   // State Đồ Chơi
@@ -24,8 +25,16 @@ export default function App() {
     else setFontSize('text-sm');
   };
 
-  if (!isUnlocked) {
-    return <Login onUnlock={() => setIsUnlocked(true)} />;
+  // Hàm Đăng xuất xịn: xóa token khỏi máy
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setToken('');
+  };
+
+  // Nếu chưa có token thì vứt ra màn hình Đăng nhập/Đăng ký
+  if (!token) {
+    return <Auth onLoginSuccess={(savedToken) => setToken(savedToken)} />;
   }
 
   return (
@@ -58,8 +67,9 @@ export default function App() {
               <button onClick={() => setIsDark(!isDark)} className="bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-200 transition" title="Giao diện tối">
                 {isDark ? '☀️ Sáng' : '🌙 Tối'}
               </button>
-              <button onClick={() => setIsUnlocked(false)} className="text-gray-400 hover:text-red-600 p-2 rounded-lg text-sm font-semibold transition" title="Khóa ứng dụng">
-                🔒 Khóa
+              {/* Đổi thành hàm handleLogout */}
+              <button onClick={handleLogout} className="text-gray-400 hover:text-red-600 p-2 rounded-lg text-sm font-semibold transition" title="Đăng xuất">
+                🚪 Đăng xuất
               </button>
             </div>
           </div>
@@ -67,9 +77,10 @@ export default function App() {
       </nav>
 
       <main className="max-w-7xl mx-auto py-4 sm:px-4 lg:px-6">
-        {currentTab === 'dashboard' && <Dashboard />}
-        {currentTab === 'nguonNhap' && <NguonNhap />}
-        {currentTab === 'doanhThu' && <DoanhThu />}
+        {/* QUAN TRỌNG: Phải truyền cái token này xuống cho mấy trang con để tụi nó xài gọi API */}
+        {currentTab === 'dashboard' && <Dashboard token={token} />}
+        {currentTab === 'nguonNhap' && <NguonNhap token={token} />}
+        {currentTab === 'doanhThu' && <DoanhThu token={token} />}
       </main>
     </div>
   );

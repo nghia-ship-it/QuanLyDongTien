@@ -15,7 +15,7 @@ export default function Auth({ onLoginSuccess }) {
     setMessage('');
 
     // Link API backend của mày (Đổi thành link Render của mày khi deploy nhé)
-    const API_URL = 'http://localhost:5000/api'; 
+   const API_URL = 'https://quanlydongtien.onrender.com/api';
 
     try {
       if (isLogin) {
@@ -65,7 +65,7 @@ export default function Auth({ onLoginSuccess }) {
       {message && <p style={{ color: 'green' }}>{message}</p>}
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <input type="email" placeholder="Email của mày" value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '8px' }} />
+        <input type="email" placeholder="Email của bạn" value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '8px' }} />
         <input type="password" placeholder="Mật khẩu" value={password} onChange={e => setPassword(e.target.value)} required style={{ padding: '8px' }} />
         
         {!isLogin && (

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_URL = 'https://quanlydongtien.onrender.com/api/doanhthu';
 
-export default function DoanhThu() {
+export default function DoanhThu({ token }) { // <--- HỨNG TOKEN
   const [list, setList] = useState([]);
   const [thang, setThang] = useState(new Date().getMonth() + 1);
   const [nam, setNam] = useState(new Date().getFullYear());
@@ -18,13 +18,20 @@ export default function DoanhThu() {
   const [suggestionsTM, setSuggestionsTM] = useState([]);
   const [suggestionsCK, setSuggestionsCK] = useState([]);
 
+  // ---> TẠO CONFIG CHỨA VÉ THÔNG HÀNH <---
+  const config = {
+    headers: {
+      'auth-token': token
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [thang, nam]);
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${API_URL}?thang=${thang}&nam=${nam}`);
+      const res = await axios.get(`${API_URL}?thang=${thang}&nam=${nam}`, config);
       setList(res.data);
     } catch (err) {
       alert('Lỗi lấy dữ liệu doanh thu!');
@@ -45,7 +52,6 @@ export default function DoanhThu() {
     const num = parseInt(rawStr);
     setRaw(num.toLocaleString('vi-VN'));
 
-    // Sinh gợi ý nhân tiền nhanh x1k, x10k, x100k, x1M
     const multipliers = [1000, 10000, 100000, 1000000];
     const sugs = multipliers.map(m => (num * m).toLocaleString('vi-VN'));
     setSug(sugs);
@@ -69,10 +75,10 @@ export default function DoanhThu() {
 
     try {
       if (selectedId) {
-        await axios.put(`${API_URL}/${selectedId}`, payload);
+        await axios.put(`${API_URL}/${selectedId}`, payload, config);
         alert('Cập nhật thành công!');
       } else {
-        await axios.post(API_URL, payload);
+        await axios.post(API_URL, payload, config);
         alert('Thêm doanh thu thành công!');
       }
       clearForm();
@@ -92,7 +98,7 @@ export default function DoanhThu() {
   const handleDelete = async (id) => {
     if (!window.confirm('Mày chắc chắn muốn xóa dòng này không?')) return;
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`, config);
       alert('Đã xóa dòng doanh thu!');
       if (selectedId === id) clearForm();
       fetchData();

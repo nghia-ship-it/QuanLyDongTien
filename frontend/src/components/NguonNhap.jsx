@@ -3,18 +3,16 @@ import axios from 'axios';
 
 const API_URL = 'https://quanlydongtien.onrender.com/api/nguonnhap';
 
-export default function NguonNhap() {
+export default function NguonNhap({ token }) { // <--- HỨNG TOKEN
   const [listGrouped, setListGrouped] = useState([]);
-  const [listNames, setListNames] = useState([]); // Danh sách tên nguồn gợi ý
+  const [listNames, setListNames] = useState([]);
   const [thang, setThang] = useState(new Date().getMonth() + 1);
   const [nam, setNam] = useState(new Date().getFullYear());
-  
-  // Chi tiết theo ngày được chọn
+
   const [selectedNgay, setSelectedNgay] = useState(null);
   const [detailList, setDetailList] = useState([]);
-  const [expandedGroup, setExpandedGroup] = useState(null); // Trạng thái mở/gập nhóm tên
+  const [expandedGroup, setExpandedGroup] = useState(null);
 
-  // Form input
   const [selectedId, setSelectedId] = useState(null);
   const [tenNguon, setTenNguon] = useState('');
   const [soTien, setSoTien] = useState('');
@@ -22,9 +20,16 @@ export default function NguonNhap() {
   const [ngayNhap, setNgayNhap] = useState(new Date().toISOString().slice(0, 16));
   const [suggestions, setSuggestions] = useState([]);
 
+  // ---> TẠO CONFIG CHỨA VÉ THÔNG HÀNH <---
+  const config = {
+    headers: {
+      'auth-token': token
+    }
+  };
+
   useEffect(() => {
     fetchGroupedData();
-    fetchNames(); // Tải danh sách tên nguồn lúc mới vào
+    fetchNames();
     setSelectedNgay(null);
     setDetailList([]);
     setExpandedGroup(null);
@@ -32,7 +37,7 @@ export default function NguonNhap() {
 
   const fetchGroupedData = async () => {
     try {
-      const res = await axios.get(`${API_URL}/grouped?thang=${thang}&nam=${nam}`);
+      const res = await axios.get(`${API_URL}/grouped?thang=${thang}&nam=${nam}`, config);
       setListGrouped(res.data);
     } catch (err) {
       alert('Lỗi lấy danh sách gom nhóm ngày!');
@@ -41,7 +46,7 @@ export default function NguonNhap() {
 
   const fetchNames = async () => {
     try {
-      const res = await axios.get(`${API_URL}/names`);
+      const res = await axios.get(`${API_URL}/names`, config);
       setListNames(res.data);
     } catch (err) {
       console.error('Lỗi lấy danh sách tên nguồn!');
@@ -50,16 +55,15 @@ export default function NguonNhap() {
 
   const loadDetailNgay = async (ngayHienThi, ngayGoc) => {
     try {
-      const res = await axios.get(`${API_URL}/detail?ngay=${ngayGoc}`);
+      const res = await axios.get(`${API_URL}/detail?ngay=${ngayGoc}`, config);
       setDetailList(res.data);
       setSelectedNgay(ngayHienThi);
-      setExpandedGroup(null); // Reset trạng thái gập/mở khi chuyển ngày khác
+      setExpandedGroup(null);
     } catch (err) {
       alert('Lỗi lấy chi tiết ngày!');
     }
   };
 
-  // Thuật toán gom nhóm detailList theo TenNguon
   const groupedDetails = useMemo(() => {
     return detailList.reduce((acc, item) => {
       if (!acc[item.tenNguon]) {
@@ -108,15 +112,15 @@ export default function NguonNhap() {
 
     try {
       if (selectedId) {
-        await axios.put(`${API_URL}/${selectedId}`, payload);
+        await axios.put(`${API_URL}/${selectedId}`, payload, config);
         alert('Cập nhật thành công!');
       } else {
-        await axios.post(API_URL, payload);
+        await axios.post(API_URL, payload, config);
         alert('Thêm nguồn nhập thành công!');
       }
       clearForm();
       fetchGroupedData();
-      fetchNames(); // Cập nhật lại danh sách tên lỡ có tên mới
+      fetchNames();
       if (selectedNgay) setSelectedNgay(null);
     } catch (err) {
       alert('Lỗi lưu dữ liệu!');
@@ -140,7 +144,7 @@ export default function NguonNhap() {
   const handleDelete = async (id) => {
     if (!window.confirm('Chắc chắn muốn xóa giao dịch nguồn này?')) return;
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`, config);
       alert('Đã xóa dữ liệu thành công!');
       clearForm();
       fetchGroupedData();
@@ -188,15 +192,14 @@ export default function NguonNhap() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Tên nguồn nhập:</label>
-            {/* Gắn datalist vào input để làm List gợi ý */}
-            <input 
-              type="text" 
+            <input
+              type="text"
               list="danhSachTenNguon"
-              value={tenNguon} 
-              onChange={(e) => setTenNguon(e.target.value)} 
-              placeholder="Ví dụ: Đại lý A, Bán lẻ..." 
-              className="w-full border rounded p-2 focus:ring-1 focus:ring-blue-500 font-semibold" 
-              required 
+              value={tenNguon}
+              onChange={(e) => setTenNguon(e.target.value)}
+              placeholder="Ví dụ: Đại lý A, Bán lẻ..."
+              className="w-full border rounded p-2 focus:ring-1 focus:ring-blue-500 font-semibold"
+              required
             />
             <datalist id="danhSachTenNguon">
               {listNames.map((name, index) => (
@@ -229,7 +232,6 @@ export default function NguonNhap() {
 
       {/* Khối Bảng hiển thị giao diện đôi */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bảng tổng hợp theo ngày */}
         <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
           <div className="bg-[#e1ebfa] p-3 border-b text-blue-800 font-bold text-sm">📋 Danh sách tổng hợp theo ngày</div>
           <table className="w-full text-left border-collapse">
@@ -253,7 +255,6 @@ export default function NguonNhap() {
           <div className="p-4 bg-gray-50 border-t font-bold text-gray-800 text-sm">Tổng tiền tháng: {formatMoney(tongThang)}</div>
         </div>
 
-        {/* Bảng chi tiết của ngày được chọn */}
         <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
           <div className="bg-emerald-50 p-3 border-b text-emerald-800 font-bold text-sm">
             {selectedNgay ? `📅 Chi tiết ngày: ${selectedNgay}` : '👈 Hãy bấm vào một ngày ở bảng bên để xem chi tiết'}
@@ -272,7 +273,6 @@ export default function NguonNhap() {
               <tbody className="text-gray-600">
                 {Object.entries(groupedDetails).map(([name, group]) => (
                   <React.Fragment key={name}>
-                    {/* Dòng cha: Tên nguồn + Tổng tiền */}
                     <tr onClick={() => toggleGroup(name)} className="bg-blue-50 cursor-pointer border-b border-blue-100 hover:bg-blue-100 transition">
                       <td className="p-3 text-center">{expandedGroup === name ? '👇' : '👉'}</td>
                       <td className="p-3 font-bold text-gray-800">
@@ -282,8 +282,7 @@ export default function NguonNhap() {
                       <td className="p-3"></td>
                       <td className="p-3"></td>
                     </tr>
-                    
-                    {/* Các dòng con: Chi tiết từng giao dịch (Chỉ hiện khi dòng cha được mở) */}
+
                     {expandedGroup === name && group.items.map(item => (
                       <tr key={item.id} className="bg-white hover:bg-gray-50 border-b border-gray-50">
                         <td className="p-3"></td>
