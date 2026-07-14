@@ -5,6 +5,7 @@ import NguonNhap from './components/NguonNhap/NguonNhap';
 import Dashboard from './components/Dashboard'; 
 import HuongDanSePay from './components/HuongDanSePay'; 
 import KhoHang from './components/KhoHang/KhoHang';
+import TaiKhoan from './components/TaiKhoan';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -91,6 +92,9 @@ export default function App() {
                 <button onClick={() => handleTabChange('huongDan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                   ⚙️ Tích hợp SePay
                 </button>
+                <button onClick={() => handleTabChange('taiKhoan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+                  👤 Tài Khoản
+                </button>
               </div>
               
               {/* Đám nút Công cụ */}
@@ -128,6 +132,9 @@ export default function App() {
               <button onClick={() => handleTabChange('huongDan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
                 ⚙️ Tích hợp SePay
               </button>
+              <button onClick={() => handleTabChange('taiKhoan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                👤 Tài Khoản
+              </button>
               
               <div className="border-t border-gray-200 mt-2 pt-4 flex gap-2 justify-center">
                 <button onClick={toggleFontSize} className="flex-1 bg-amber-100 text-amber-800 px-3 py-2 rounded-lg font-bold hover:bg-amber-200 transition">
@@ -151,6 +158,7 @@ export default function App() {
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}
         {currentTab === 'khoHang'&& <KhoHang token={token}/>}
         {currentTab === 'huongDan' && <HuongDanSePay />}
+        {currentTab === 'taiKhoan' && <TaiKhoan token={token} />}
       </main>
     </div>
   );
