@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
-// Bảng User
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true }, 
     password: { type: String, required: true },
     email: { type: String, default: '' },
     phoneNumber: { type: String, default: '' },
     soTaiKhoanBank: { type: String, default: '' }, 
-    tenNganHang: { type: String, default: '' }
+    tenNganHang: { type: String, default: '' },
+    loaiTaiKhoan: { type: String, default: 'ca_nhan' } // ca_nhan hoac doanh_nghiep
 });
 const User = mongoose.model('User', userSchema);
 
-// Bảng Doanh Thu
 const doanhThuSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     ngayNhap: String,
@@ -22,7 +21,6 @@ const doanhThuSchema = new mongoose.Schema({
 });
 const DoanhThu = mongoose.model('DoanhThu', doanhThuSchema);
 
-// Bảng Nguồn Nhập
 const nguonNhapSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     tenNguon: String,
@@ -32,7 +30,6 @@ const nguonNhapSchema = new mongoose.Schema({
 });
 const NguonNhap = mongoose.model('NguonNhap', nguonNhapSchema);
 
-//  KHO HÀNG 
 const khoHangSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     tenSanPham: { type: String, required: true },

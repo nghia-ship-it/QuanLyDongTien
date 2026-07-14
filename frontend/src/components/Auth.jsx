@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 export default function Auth({ onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true); 
-  // Đổi state email thành username
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   const [soTaiKhoanBank, setSoTaiKhoanBank] = useState('');
   const [tenNganHang, setTenNganHang] = useState('');
+  const [loaiTaiKhoan, setLoaiTaiKhoan] = useState('ca_nhan'); 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -19,27 +19,24 @@ export default function Auth({ onLoginSuccess }) {
 
     try {
       if (isLogin) {
-        // Xử lý Đăng Nhập
         const res = await fetch(`${API_URL}/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }) // Gửi username thay vì email
+          body: JSON.stringify({ username, password }) 
         });
         const data = await res.json();
         
         if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại');
         
-        // Lưu token và thông tin user vào localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
         onLoginSuccess(data.token);
       } else {
-        // Xử lý Đăng Ký
         const res = await fetch(`${API_URL}/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, soTaiKhoanBank, tenNganHang }) // Gửi username thay vì email
+          body: JSON.stringify({ username, password, soTaiKhoanBank, tenNganHang, loaiTaiKhoan }) 
         });
         const data = await res.json();
         
@@ -85,6 +82,17 @@ export default function Auth({ onLoginSuccess }) {
         
         {!isLogin && (
           <>
+            <div style={{ display: 'flex', gap: '15px', padding: '10px 0', borderBottom: '1px dashed #ccc', marginBottom: '5px' }}>
+              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold', color: loaiTaiKhoan === 'ca_nhan' ? '#28a745' : '#555' }}>
+                <input type="radio" name="loaiTK" value="ca_nhan" checked={loaiTaiKhoan === 'ca_nhan'} onChange={() => setLoaiTaiKhoan('ca_nhan')} />
+                🧑 Cá nhân (Thu/Chi)
+              </label>
+              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold', color: loaiTaiKhoan === 'doanh_nghiep' ? '#28a745' : '#555' }}>
+                <input type="radio" name="loaiTK" value="doanh_nghiep" checked={loaiTaiKhoan === 'doanh_nghiep'} onChange={() => setLoaiTaiKhoan('doanh_nghiep')} />
+                🏬 Doanh nghiệp (Có Kho)
+              </label>
+            </div>
+
             <input 
               type="text" 
               placeholder="Số tài khoản ngân hàng (Để SePay canh)" 

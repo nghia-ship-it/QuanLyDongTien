@@ -1,71 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import Auth from './components/Auth'; 
-import DoanhThu from './components/DoanhThu/DoanhThu';
-import NguonNhap from './components/NguonNhap/NguonNhap';
-import Dashboard from './components/Dashboard'; 
-import HuongDanSePay from './components/HuongDanSePay'; 
-import KhoHang from './components/KhoHang/KhoHang';
+import React, { useState } from 'react';
+import Auth from './components/Auth';
+import Dashboard from './components/Dashboard';
+import NguonNhap from './components/NguonNhap';
+import DoanhThu from './components/DoanhThu';
+import KhoHang from './components/KhoHang';
 import TaiKhoan from './components/TaiKhoan';
+import HuongDanSePay from './components/HuongDanSePay';
 
 export default function App() {
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const [currentTab, setCurrentTab] = useState('dashboard');
-  
-  // State Đồ Chơi
-  const [isDark, setIsDark] = useState(false);
-  const [fontSize, setFontSize] = useState('text-base');
-  
-  // State quản lý Menu Xổ xuống trên điện thoại/laptop nhỏ
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    if (isDark) document.body.classList.add('dark-theme');
-    else document.body.classList.remove('dark-theme');
-  }, [isDark]);
+  // Lấy thông tin user để soi loại tài khoản
+  const userInfo = JSON.parse(localStorage.getItem('user') || '{}');
 
-  const toggleFontSize = () => {
-    if (fontSize === 'text-sm') setFontSize('text-base');
-    else if (fontSize === 'text-base') setFontSize('text-lg');
-    else setFontSize('text-sm');
+  const handleLoginSuccess = (newToken) => {
+    setToken(newToken);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setToken('');
+    setToken(null);
   };
 
-  // Hàm chuyển tab tiện tay đóng luôn cái menu trên điện thoại
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
-    setIsMenuOpen(false); 
+    setIsMobileMenuOpen(false);
   };
 
   if (!token) {
-    return <Auth onLoginSuccess={(savedToken) => setToken(savedToken)} />;
+    return <Auth onLoginSuccess={handleLoginSuccess} />;
   }
 
   return (
-    <div className={`min-h-screen bg-gray-100 ${fontSize} font-sans antialiased transition-all`}>
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm relative">
+    <div className="min-h-screen bg-gray-100">
+      {/* Header & Navigation */}
+      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-black text-indigo-600 tracking-tight">SmartBiz SaaS</h1>
+            </div>
             
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                💼 <span className="hidden sm:inline">Quản Lý Dòng Tiền</span>
-              </span>
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-2">
+              <button onClick={() => handleTabChange('dashboard')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                📊 Tổng Quan
+              </button>
+              <button onClick={() => handleTabChange('nguonNhap')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                💰 Nguồn Nhập
+              </button>
+              <button onClick={() => handleTabChange('doanhThu')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                📈 Doanh Thu
+              </button>
+              
+              {/* CHỈ HIỆN KHO HÀNG NẾU LÀ DOANH NGHIỆP */}
+              {userInfo.loaiTaiKhoan === 'doanh_nghiep' && (
+                <button onClick={() => handleTabChange('khoHang')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  📦 Kho Hàng
+                </button>
+              )}
+
+              <button onClick={() => handleTabChange('huongDan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                ⚙️ Tích hợp SePay
+              </button>
+              <button onClick={() => handleTabChange('taiKhoan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                👤 Tài Khoản
+              </button>
+              
+              <button onClick={handleLogout} className="ml-4 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition">
+                🚪 Đăng xuất
+              </button>
             </div>
 
-            {/* Nút Menu Hamburger (Chỉ hiện trên màn hình nhỏ) */}
-            <div className="flex lg:hidden">
-              <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none p-2 rounded-md transition"
-              >
-                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  {isMenuOpen ? (
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-500 hover:text-gray-700 focus:outline-none p-2">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {isMobileMenuOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   ) : (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -73,90 +87,51 @@ export default function App() {
                 </svg>
               </button>
             </div>
-
-            {/* Cụm Nút Điều Hướng & Công Cụ (Chỉ hiện trên màn hình bự từ LG trở lên) */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <div className="flex space-x-2">
-                <button onClick={() => handleTabChange('dashboard')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'dashboard' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  📊 Tổng Quan
-                </button>
-                <button onClick={() => handleTabChange('nguonNhap')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  💰 Nguồn Nhập
-                </button>
-                <button onClick={() => handleTabChange('doanhThu')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  📈 Doanh Thu
-                </button>
-                <button onClick={() => handleTabChange('khoHang')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  📦 Kho Hàng
-                </button>
-                <button onClick={() => handleTabChange('huongDan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  ⚙️ Tích hợp SePay
-                </button>
-                <button onClick={() => handleTabChange('taiKhoan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                  👤 Tài Khoản
-                </button>
-              </div>
-              
-              {/* Đám nút Công cụ */}
-              <div className="flex items-center gap-2 border-l pl-6">
-                <button onClick={toggleFontSize} className="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-200 transition" title="Đổi cỡ chữ">
-                  A±
-                </button>
-                <button onClick={() => setIsDark(!isDark)} className="bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-200 transition" title="Giao diện tối">
-                  {isDark ? '☀️ Sáng' : '🌙 Tối'}
-                </button>
-                <button onClick={handleLogout} className="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg text-sm font-bold transition" title="Đăng xuất">
-                  🚪 Đăng xuất
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Dropdown Menu thả xuống cho Điện thoại / Laptop nhỏ */}
-        {isMenuOpen && (
-          <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-xl z-50">
-            <div className="px-4 pt-2 pb-4 space-y-2 flex flex-col">
-              <button onClick={() => handleTabChange('dashboard')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'dashboard' ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                📊 Tổng Quan
-              </button>
-              <button onClick={() => handleTabChange('nguonNhap')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                💰 Nguồn Nhập
-              </button>
-              <button onClick={() => handleTabChange('doanhThu')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                📈 Doanh Thu
-              </button>
+        {/* Mobile Menu Panel */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-b border-gray-200 px-2 pt-2 pb-3 space-y-1 shadow-lg">
+            <button onClick={() => handleTabChange('dashboard')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+              📊 Tổng Quan
+            </button>
+            <button onClick={() => handleTabChange('nguonNhap')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+              💰 Nguồn Nhập
+            </button>
+            <button onClick={() => handleTabChange('doanhThu')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+              📈 Doanh Thu
+            </button>
+
+            {/* CHỈ HIỆN KHO HÀNG NẾU LÀ DOANH NGHIỆP */}
+            {userInfo.loaiTaiKhoan === 'doanh_nghiep' && (
               <button onClick={() => handleTabChange('khoHang')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
                 📦 Kho Hàng
               </button>
-              <button onClick={() => handleTabChange('huongDan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                ⚙️ Tích hợp SePay
-              </button>
-              <button onClick={() => handleTabChange('taiKhoan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                👤 Tài Khoản
-              </button>
-              
-              <div className="border-t border-gray-200 mt-2 pt-4 flex gap-2 justify-center">
-                <button onClick={toggleFontSize} className="flex-1 bg-amber-100 text-amber-800 px-3 py-2 rounded-lg font-bold hover:bg-amber-200 transition">
-                  A±
-                </button>
-                <button onClick={() => setIsDark(!isDark)} className="flex-1 bg-indigo-100 text-indigo-800 px-3 py-2 rounded-lg font-bold hover:bg-indigo-200 transition">
-                  {isDark ? '☀️ Sáng' : '🌙 Tối'}
-                </button>
-                <button onClick={handleLogout} className="flex-1 bg-red-100 text-red-700 px-3 py-2 rounded-lg font-bold hover:bg-red-200 transition">
-                  🚪 Thoát
-                </button>
-              </div>
-            </div>
+            )}
+
+            <button onClick={() => handleTabChange('huongDan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+              ⚙️ Tích hợp SePay
+            </button>
+            <button onClick={() => handleTabChange('taiKhoan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+              👤 Tài Khoản
+            </button>
+            <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 font-bold rounded-lg transition mt-2">
+              🚪 Đăng xuất
+            </button>
           </div>
         )}
       </nav>
 
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto py-4 sm:px-4 lg:px-6">
         {currentTab === 'dashboard' && <Dashboard token={token} />}
         {currentTab === 'nguonNhap' && <NguonNhap token={token} />}
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}
-        {currentTab === 'khoHang'&& <KhoHang token={token}/>}
+        
+        {/* CHẶN HIỂN THỊ COMPONENT NẾU KHÔNG PHẢI DOANH NGHIỆP */}
+        {currentTab === 'khoHang' && userInfo.loaiTaiKhoan === 'doanh_nghiep' && <KhoHang token={token} />}
+        
         {currentTab === 'huongDan' && <HuongDanSePay />}
         {currentTab === 'taiKhoan' && <TaiKhoan token={token} />}
       </main>
