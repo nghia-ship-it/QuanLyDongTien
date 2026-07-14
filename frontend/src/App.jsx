@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Auth from './components/Auth'; 
-import DoanhThu from './components/DoanhThu';
-import NguonNhap from './components/NguonNhap';
+import DoanhThu from './components/DoanhThu/DoanhThu';
+import NguonNhap from './components/NguonNhap/NguonNhap';
 import Dashboard from './components/Dashboard'; 
 import HuongDanSePay from './components/HuongDanSePay'; 
 import KhoHang from './components/KhoHang/KhoHang';

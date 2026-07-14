@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 
 // Bảng User
 const userSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true }, 
     password: { type: String, required: true },
+    email: { type: String, default: '' },
+    phoneNumber: { type: String, default: '' },
     soTaiKhoanBank: { type: String, default: '' }, 
     tenNganHang: { type: String, default: '' }
 });
