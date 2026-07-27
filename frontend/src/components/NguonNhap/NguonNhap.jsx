@@ -70,7 +70,7 @@ export default function NguonNhap({ token }) {
     <div className="p-6 bg-[#f0f4f8] min-h-screen">
       {/* Header */}
       <div className="bg-[#1e78c8] p-4 rounded-xl text-white shadow-md flex flex-wrap justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">💰 Quản Lý Nguồn Nhập</h2>
+        <h2 className="text-xl font-bold">💰 Quản Lý Nguồn Chi Tiêu</h2>
         <div className="flex gap-4 items-center">
           <label className="font-medium">Tháng:</label>
           <select value={thang} onChange={(e) => setThang(e.target.value)} className="text-black p-1 rounded bg-white outline-none">

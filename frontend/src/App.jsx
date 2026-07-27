@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
-import NguonNhap from './components/NguonNhap';
-import DoanhThu from './components/DoanhThu';
-import KhoHang from './components/KhoHang';
+import NguonNhap from './components/NguonNhap/NguonNhap';
+import DoanhThu from './components/DoanhThu/DoanhThu';
+import KhoHang from './components/KhoHang/KhoHang';
 import TaiKhoan from './components/TaiKhoan';
 import HuongDanSePay from './components/HuongDanSePay';
 
@@ -50,7 +50,7 @@ export default function App() {
                 📊 Tổng Quan
               </button>
               <button onClick={() => handleTabChange('nguonNhap')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                💰 Nguồn Nhập
+                💰 Chi Tiêu
               </button>
               <button onClick={() => handleTabChange('doanhThu')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                 📈 Doanh Thu
@@ -97,7 +97,7 @@ export default function App() {
               📊 Tổng Quan
             </button>
             <button onClick={() => handleTabChange('nguonNhap')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-              💰 Nguồn Nhập
+              💰 Chi Tiêu
             </button>
             <button onClick={() => handleTabChange('doanhThu')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
               📈 Doanh Thu

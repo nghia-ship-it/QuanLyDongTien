@@ -28,7 +28,7 @@ export default function NguonNhapTable({ listGrouped, detailList, selectedNgay, 
           <thead>
             <tr className="bg-gray-100 text-gray-700 text-xs font-bold uppercase border-b">
               <th className="p-3">Ngày</th>
-              <th className="p-3">Tổng Tiền Nhập</th>
+              <th className="p-3">Tổng Tiền Chi</th>
               <th className="p-3 text-center">Số Giao Dịch</th>
             </tr>
           </thead>
