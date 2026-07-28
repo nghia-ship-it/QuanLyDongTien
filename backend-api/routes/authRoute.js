@@ -9,8 +9,8 @@ const { verifyToken } = require('../middleware/auth');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'nghiateprieunew@gmail.com',
-        pass: 'hpqf zemw baue ppda'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
@@ -120,7 +120,7 @@ router.post('/forgot-password', async (req, res) => {
         const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
 
         const mailOptions = {
-            from: '"SmartBiz SaaS" <nghiateprieunew@gmail.com>',
+            from: `"SmartBiz SaaS" <${process.env.EMAIL_USER}>`,
             to: email, 
             subject: '🔒 Yêu cầu khôi phục mật khẩu',
             html: `
