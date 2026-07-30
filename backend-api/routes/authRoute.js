@@ -125,7 +125,7 @@ router.post('/forgot-password', async (req, res) => {
         const resetToken = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET || 'BiMatCuaTao', { expiresIn: '15m' });
 
         // Tạo link để người dùng click vào (Trỏ về Frontend)
-        const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+        const resetLink = `https://cashflowvn.vercel.app/reset-password?token=${resetToken}`;
 
         const mailOptions = {
             from: `"SmartBiz SaaS" <${process.env.EMAIL_USER}>`,
