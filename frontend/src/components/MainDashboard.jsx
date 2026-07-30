@@ -25,7 +25,7 @@ export default function MainDashboard({ onLogout }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-black text-indigo-600 tracking-tight">SmartBiz SaaS</h1>
+              <h1 className="text-xl font-black text-indigo-600 tracking-tight">FLOW</h1>
             </div>
             
             {/* Desktop Menu */}
