@@ -5,6 +5,7 @@ import DoanhThu from './DoanhThu/DoanhThu';
 import KhoHang from './KhoHang/KhoHang';
 import TaiKhoan from './TaiKhoan';
 import HuongDanSePay from './HuongDanSePay';
+import CongNo from './CongNo/CongNo'
 
 export default function MainDashboard({ onLogout }) {
   const token = localStorage.getItem('token');
@@ -37,6 +38,9 @@ export default function MainDashboard({ onLogout }) {
               </button>
               <button onClick={() => handleTabChange('doanhThu')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                 📈 Doanh Thu
+              </button>
+              <button onClick={() =>handleTabChange('congNo')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'congNo' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                 📒 Công Nợ
               </button>
               
               {/* CHỈ HIỆN KHO HÀNG NẾU LÀ DOANH NGHIỆP */}
@@ -85,6 +89,9 @@ export default function MainDashboard({ onLogout }) {
             <button onClick={() => handleTabChange('doanhThu')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
               📈 Doanh Thu
             </button>
+            <button onClick={() =>handleTabChange('congNo')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'congNo' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                 📒 Công Nợ
+              </button>
 
             {/* CHỈ HIỆN KHO HÀNG NẾU LÀ DOANH NGHIỆP */}
             {userInfo.loaiTaiKhoan === 'doanh_nghiep' && (
@@ -111,6 +118,7 @@ export default function MainDashboard({ onLogout }) {
         {currentTab === 'dashboard' && <Dashboard token={token} />}
         {currentTab === 'nguonNhap' && <NguonNhap token={token} />}
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}
+        {currentTab === 'congNo' && <CongNo token={token} />}
         
         {/* CHẶN HIỂN THỊ COMPONENT NẾU KHÔNG PHẢI DOANH NGHIỆP */}
         {currentTab === 'khoHang' && userInfo.loaiTaiKhoan === 'doanh_nghiep' && <KhoHang token={token} />}
