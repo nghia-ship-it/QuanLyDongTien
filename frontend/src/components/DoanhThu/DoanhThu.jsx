@@ -52,6 +52,7 @@ export default function DoanhThu({ token }) {
 
   return (
     <div className="p-6 bg-transparent min-h-screen">
+      {/* Header Điều khiển Tháng/Năm */}
       <div className="bg-[#14a064] p-4 rounded-xl text-white shadow-md flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-xl font-bold">📈 Thông Tin Doanh Thu</h2>
         <div className="flex gap-4 items-center">
@@ -59,18 +60,35 @@ export default function DoanhThu({ token }) {
           <select value={thang} onChange={(e) => setThang(e.target.value)} className="text-black p-1 rounded bg-white outline-none">
             {Array.from({ length: 12 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
           </select>
+          
           <label className="font-medium">Năm:</label>
           <select value={nam} onChange={(e) => setNam(e.target.value)} className="text-black p-1 rounded bg-white outline-none">
             {Array.from({ length: 5 }, (_, i) => <option key={2024 + i} value={2024 + i}>{2024 + i}</option>)}
           </select>
+          
           <button onClick={() => setSelectedItem(null)} className="bg-gray-600 px-3 py-1 rounded hover:bg-gray-700 transition font-medium text-sm">
             🔄 Làm mới Form
           </button>
         </div>
       </div>
 
-      <DoanhThuForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportCSV} />
-      <DoanhThuTable list={list} onEdit={setSelectedItem} onDelete={handleDelete} formatMoney={formatMoney} tongThang={tongThang} thang={thang} />
+      {/* Gọi 2 component con lên */}
+      <DoanhThuForm 
+        token={token} 
+        onRefresh={fetchData} 
+        selectedItem={selectedItem} 
+        clearSelection={() => setSelectedItem(null)} 
+        onExport={exportCSV} 
+      />
+
+      <DoanhThuTable 
+        list={list} 
+        onEdit={setSelectedItem} 
+        onDelete={handleDelete} 
+        formatMoney={formatMoney} 
+        tongThang={tongThang} 
+        thang={thang} 
+      />
     </div>
   );
 }
