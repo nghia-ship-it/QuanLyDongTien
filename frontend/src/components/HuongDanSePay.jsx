@@ -7,19 +7,18 @@ export default function HuongDanSePay() {
   const handleCopy = () => {
     navigator.clipboard.writeText(webhookUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // 2 giây sau tắt chữ "Đã copy"
+    setTimeout(() => setCopied(false), 2000); 
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div className="p-6 bg-transparent min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/20">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-black text-gray-800 tracking-tight">🚀 Tích Hợp Thanh Toán Tự Động</h2>
           <p className="text-gray-500 mt-2">Biến tài khoản ngân hàng của bạn thành máy thu tiền tự động chỉ với 3 bước đơn giản.</p>
         </div>
 
         <div className="space-y-8">
-          {/* Bước 1 */}
           <div className="flex gap-4">
             <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg">1</div>
             <div>
@@ -30,7 +29,6 @@ export default function HuongDanSePay() {
             </div>
           </div>
 
-          {/* Bước 2 */}
           <div className="flex gap-4">
             <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg">2</div>
             <div>
@@ -56,7 +54,6 @@ export default function HuongDanSePay() {
             </div>
           </div>
 
-          {/* Bước 3 */}
           <div className="flex gap-4">
             <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg">3</div>
             <div>
@@ -67,7 +64,6 @@ export default function HuongDanSePay() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

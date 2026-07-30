@@ -7,7 +7,6 @@ export default function TaiKhoan({ token }) {
   const [soTaiKhoanBank, setSoTaiKhoanBank] = useState('');
   const [tenNganHang, setTenNganHang] = useState('');
   
-  // Đổi mật khẩu
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
@@ -15,7 +14,6 @@ export default function TaiKhoan({ token }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Lấy thông tin user hiện tại từ bộ nhớ tạm trình duyệt
     const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
     setUserInfo(savedUser);
     setEmail(savedUser.email || '');
@@ -26,14 +24,10 @@ export default function TaiKhoan({ token }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
+    setMessage(''); setError('');
 
     const payload = {
-      email,
-      phoneNumber,
-      soTaiKhoanBank,
-      tenNganHang,
+      email, phoneNumber, soTaiKhoanBank, tenNganHang,
       oldPassword: oldPassword || undefined,
       newPassword: newPassword || undefined
     };
@@ -41,29 +35,21 @@ export default function TaiKhoan({ token }) {
     try {
       const res = await fetch('https://quanlydongtien.onrender.com/api/update-profile', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'auth-token': token
-        },
+        headers: { 'Content-Type': 'application/json', 'auth-token': token },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || 'Cập nhật thất bại!');
 
-      // Cập nhật lại thông tin mới vào localStorage để dùng dần
       localStorage.setItem('user', JSON.stringify(data.user));
       setMessage('🎉 Cập nhật thông tin thành công!');
-      setOldPassword('');
-      setNewPassword('');
-    } catch (err) {
-      setError(err.message);
-    }
+      setOldPassword(''); setNewPassword('');
+    } catch (err) { setError(err.message); }
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+    <div className="p-6 bg-transparent min-h-screen">
+      <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/20">
         <h2 className="text-2xl font-black text-gray-800 mb-2">👤 Thông tin Tài khoản</h2>
         <p className="text-gray-500 mb-6">Xin chào, <span className="font-bold text-indigo-600">{userInfo.username}</span>! Bạn có thể cập nhật thông tin cá nhân tại đây.</p>
 
@@ -72,7 +58,6 @@ export default function TaiKhoan({ token }) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Cột 1: Thông tin liên hệ */}
             <div className="space-y-4 bg-gray-50 p-5 rounded-xl border border-gray-100">
               <h3 className="font-bold text-gray-700 border-b pb-2">Thông tin liên hệ</h3>
               <div>
@@ -85,7 +70,6 @@ export default function TaiKhoan({ token }) {
               </div>
             </div>
 
-            {/* Cột 2: Thông tin Ngân hàng (Webhook) */}
             <div className="space-y-4 bg-gray-50 p-5 rounded-xl border border-gray-100">
               <h3 className="font-bold text-gray-700 border-b pb-2">Liên kết Ngân hàng (SePay)</h3>
               <div>
@@ -99,7 +83,6 @@ export default function TaiKhoan({ token }) {
             </div>
           </div>
 
-          {/* Đổi mật khẩu (Không bắt buộc) */}
           <div className="bg-red-50 p-5 rounded-xl border border-red-100">
             <h3 className="font-bold text-red-800 border-b border-red-200 pb-2 mb-4">Đổi mật khẩu (Bỏ trống nếu không muốn đổi)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

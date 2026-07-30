@@ -31,13 +31,18 @@ export default function MainDashboard({ onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      <div className="fixed inset-0 z-0">
+        <img src="/LandingPage.png" alt="Background" className="w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
+
       {/* Navbar đồng bộ Landing Page */}
       <nav className="bg-[radial-gradient(circle_at_75%_10%,#5D5C5B_0%,#2B2B2B_35%,#111111_100%)] shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-2">
-              <img src="/logo-flow.png" alt="FLOW Logo" className="h-8 w-auto object-contain" />
+              <img src="/favicon.png" alt="FLOW Logo" className="h-8 w-auto object-contain" />
               <h1 className="text-xl font-extrabold text-emerald-500 tracking-tight">F.L.O.W</h1>
             </div>
             
@@ -78,7 +83,7 @@ export default function MainDashboard({ onLogout }) {
         )}
       </nav>
 
-      <main className="flex-grow max-w-7xl mx-auto w-full py-4 sm:px-4 lg:px-6">
+      <main className="relative z-10 flex-grow max-w-7xl mx-auto w-full py-4 sm:px-4 lg:px-6">
         {currentTab === 'dashboard' && <Dashboard token={token} />}
         {currentTab === 'nguonNhap' && <NguonNhap token={token} />}
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}

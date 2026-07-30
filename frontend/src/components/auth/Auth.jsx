@@ -4,25 +4,27 @@ import RegisterForm from './RegisterForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
 export default function Auth({ onLoginSuccess }) {
-  // Quản lý trạng thái xem màn hình nào: 'login', 'register', hay 'forgot'
   const [view, setView] = useState('login'); 
 
   return (
-    <div style={{ maxWidth: '400px', margin: '100px auto', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', fontFamily: 'Arial, sans-serif', backgroundColor: '#fff', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
-      
-      <h2 style={{ textAlign: 'center', color: '#1e293b', marginBottom: '20px' }}>
-        {view === 'forgot' && '🔓 KHÔI PHỤC MẬT KHẨU'}
-        {view === 'login' && '🔑 ĐĂNG NHẬP HỆ THỐNG'}
-        {view === 'register' && '📝 ĐĂNG KÝ TÀI KHOẢN'}
-      </h2>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans">
+      <div className="absolute inset-0 z-0">
+        <img src="/LandingPage.png" alt="Background" className="w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
 
-      {/* Dựa vào state view mà nó render đúng Component ra */}
-      {view === 'login' && <LoginForm onLoginSuccess={onLoginSuccess} setView={setView} />}
-      
-      {view === 'register' && <RegisterForm setView={setView} />}
-      
-      {view === 'forgot' && <ForgotPasswordForm setView={setView} />}
-      
+      {/* Khung Form Đăng nhập (Hiệu ứng kính mờ Glassmorphism) */}
+      <div className="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20">
+        <h2 className="text-center text-2xl font-black text-gray-800 mb-6 uppercase">
+          {view === 'forgot' && '🔓 Khôi phục mật khẩu'}
+          {view === 'login' && '🔑 Đăng nhập hệ thống'}
+          {view === 'register' && '📝 Đăng ký tài khoản'}
+        </h2>
+
+        {view === 'login' && <LoginForm onLoginSuccess={onLoginSuccess} setView={setView} />}
+        {view === 'register' && <RegisterForm setView={setView} />}
+        {view === 'forgot' && <ForgotPasswordForm setView={setView} />}
+      </div>
     </div>
   );
 }

@@ -10,7 +10,6 @@ export default function NguonNhap({ token }) {
   const [listNames, setListNames] = useState([]);
   const [thang, setThang] = useState(new Date().getMonth() + 1);
   const [nam, setNam] = useState(new Date().getFullYear());
-
   const [selectedNgay, setSelectedNgay] = useState(null);
   const [detailList, setDetailList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -63,7 +62,6 @@ export default function NguonNhap({ token }) {
     setSelectedNgay(null); 
   };
 
-  // Hàm xuất Excel
   const exportCSV = () => {
     let csvContent = "\uFEFFNgày,Tổng Tiền Chi,Số Giao Dịch\n";
     listGrouped.forEach(r => {
@@ -80,7 +78,7 @@ export default function NguonNhap({ token }) {
   const tongThang = listGrouped.reduce((acc, curr) => acc + curr.tongTienNgay, 0);
 
   return (
-    <div className="p-6 bg-[#f0f4f8] min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="bg-[#1e78c8] p-4 rounded-xl text-white shadow-md flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-xl font-bold">💰 Quản Lý Nguồn Chi Tiêu</h2>
         <div className="flex gap-4 items-center">
@@ -98,25 +96,8 @@ export default function NguonNhap({ token }) {
         </div>
       </div>
 
-      <NguonNhapForm 
-        token={token} 
-        onRefresh={handleRefreshAfterSubmit} 
-        selectedItem={selectedItem} 
-        clearSelection={() => setSelectedItem(null)} 
-        listNames={listNames} 
-        onExport={exportCSV}
-      />
-
-      <NguonNhapTable 
-        listGrouped={listGrouped} 
-        detailList={detailList} 
-        selectedNgay={selectedNgay} 
-        loadDetailNgay={loadDetailNgay} 
-        onEdit={setSelectedItem} 
-        onDelete={handleDelete} 
-        tongThang={tongThang} 
-        formatMoney={formatMoney} 
-      />
+      <NguonNhapForm token={token} onRefresh={handleRefreshAfterSubmit} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} listNames={listNames} onExport={exportCSV} />
+      <NguonNhapTable listGrouped={listGrouped} detailList={detailList} selectedNgay={selectedNgay} loadDetailNgay={loadDetailNgay} onEdit={setSelectedItem} onDelete={handleDelete} tongThang={tongThang} formatMoney={formatMoney} />
     </div>
   );
 }

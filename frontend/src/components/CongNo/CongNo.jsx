@@ -47,7 +47,7 @@ export default function CongNo({ token }) {
   const tongNoDaiLy = list.filter(i => i.loaiCongNo === 'no_dai_ly').reduce((acc, curr) => acc + (curr.soTienNo - curr.soTienDaTra), 0);
 
   return (
-    <div className="p-6 bg-[#fff7ed] min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="bg-[#ea580c] p-4 rounded-xl text-white shadow-md flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">📒 Quản Lý Công Nợ</h2>
         <button onClick={() => setSelectedItem(null)} className="bg-white/20 px-3 py-1 rounded hover:bg-white/30 font-semibold text-sm transition">

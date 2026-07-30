@@ -8,20 +8,15 @@ const API_URL = 'https://quanlydongtien.onrender.com/api/khohang';
 export default function KhoHang({ token }) {
   const [list, setList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null); 
-
   const config = { headers: { 'auth-token': token } };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       const res = await axios.get(API_URL, config);
       setList(res.data);
-    } catch (err) {
-      alert('Lỗi lấy dữ liệu kho hàng!');
-    }
+    } catch (err) { alert('Lỗi lấy dữ liệu kho hàng!'); }
   };
 
   const handleDelete = async (id) => {
@@ -50,7 +45,7 @@ export default function KhoHang({ token }) {
   const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
 
   return (
-    <div className="p-6 bg-[#fffbf0] min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="bg-[#d97706] p-4 rounded-xl text-white shadow-md flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">📦 Quản Lý Kho Hàng & Vật Tư</h2>
         <button onClick={() => setSelectedItem(null)} className="bg-gray-800 px-3 py-1 rounded hover:bg-gray-900 font-semibold text-sm transition">
@@ -58,21 +53,8 @@ export default function KhoHang({ token }) {
         </button>
       </div>
 
-      <KhoHangForm 
-        token={token} 
-        onRefresh={fetchData} 
-        selectedItem={selectedItem} 
-        clearSelection={() => setSelectedItem(null)} 
-        onExport={exportCSV}
-      />
-      
-      <KhoHangTable 
-        list={list} 
-        onEdit={setSelectedItem} 
-        onDelete={handleDelete} 
-        tongGiaTriKho={tongGiaTriKho} 
-        formatMoney={formatMoney} 
-      />
+      <KhoHangForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportCSV} />
+      <KhoHangTable list={list} onEdit={setSelectedItem} onDelete={handleDelete} tongGiaTriKho={tongGiaTriKho} formatMoney={formatMoney} />
     </div>
   );
 }
