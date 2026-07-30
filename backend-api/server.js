@@ -18,13 +18,15 @@ const authRoute = require('./routes/authRoute');
 const doanhThuRoute = require('./routes/doanhThuRoute');
 const nguonNhapRoute = require('./routes/nguonNhapRoute');
 const webhookRoute = require('./routes/webhookRoute');
+const congNoRoute = require('./routes/congNoRoute');
 
 // 3. ĐĂNG KÝ ĐƯỜNG DẪN API
-app.use('/api', authRoute);              // Sẽ chạy: /api/login, /api/register
-app.use('/api/doanhthu', doanhThuRoute); // Sẽ chạy: /api/doanhthu/...
-app.use('/api/nguonnhap', nguonNhapRoute); // Sẽ chạy: /api/nguonnhap/...
-app.use('/api/khohang' ,khoHangRoute); // Sẽ chạy : /api/khoHangRoute
-app.use('/api/webhook', webhookRoute);   // Sẽ chạy: /api/webhook/sepay
+app.use('/api', authRoute); 
+app.use('/api/doanhthu', doanhThuRoute);
+app.use('/api/nguonnhap', nguonNhapRoute);
+app.use('/api/khohang' ,khoHangRoute);
+app.use('/api/webhook', webhookRoute);
+app.use('/api/congno', congNoRoute);
 
 // 4. CHẠY SERVER
 const PORT = process.env.PORT || 5000;

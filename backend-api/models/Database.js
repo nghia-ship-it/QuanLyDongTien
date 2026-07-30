@@ -41,4 +41,18 @@ const khoHangSchema = new mongoose.Schema({
 });
 const KhoHang = mongoose.model('KhoHang', khoHangSchema);
 
-module.exports = { User, DoanhThu, NguonNhap, KhoHang };
+// Quản lý Khách nợ mình & Mình nợ Đại lý
+const congNoSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    loaiCongNo: { type: String, enum: ['khach_no', 'no_dai_ly'], required: true }, // Ai đang nợ?
+    tenDoiTac: { type: String, required: true }, // Tên khách hoặc tên nhà cung cấp
+    soTienNo: { type: Number, required: true }, // Số tiền nợ ban đầu
+    soTienDaTra: { type: Number, default: 0 }, // Trả góp từ từ
+    trangThai: { type: String, default: 'Chưa thanh toán' }, // Xong rồi thì đổi thành 'Đã thanh toán'
+    ngayGhiNo: { type: String },
+    ngayHenTra: { type: String },
+    ghiChu: String
+});
+const CongNo = mongoose.model('CongNo', congNoSchema);
+
+module.exports = { User, DoanhThu, NguonNhap, KhoHang, CongNo };
