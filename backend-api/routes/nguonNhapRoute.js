@@ -59,4 +59,23 @@ router.delete('/:id', verifyToken, async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// --- API NHẬP HÀNG LOẠT EXCEL CHO NGUỒN NHẬP (CHI TIÊU) ---
+router.post('/bulk', verifyToken, async (req, res) => {
+    try {
+        const dataArray = req.body.data;
+        if (!dataArray || dataArray.length === 0) return res.status(400).json({ message: 'Không có dữ liệu!' });
+
+        const dataToSave = dataArray.map(item => ({
+            userId: req.user._id,
+            tenNguon: item.tenNguon || 'Khác',
+            soTien: Number(item.soTien) || 0,
+            ghiChu: item.ghiChu || '',
+            ngayNhap: item.ngayNhap || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00'
+        }));
+
+        await NguonNhap.insertMany(dataToSave);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;

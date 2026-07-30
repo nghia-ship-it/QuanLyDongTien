@@ -5,7 +5,7 @@ import DoanhThu from './DoanhThu/DoanhThu';
 import KhoHang from './KhoHang/KhoHang';
 import TaiKhoan from './TaiKhoan';
 import HuongDanSePay from './HuongDanSePay';
-import CongNo from './CongNo/CongNo'
+import CongNo from './CongNo/CongNo';
 
 export default function MainDashboard({ onLogout }) {
   const token = localStorage.getItem('token');
@@ -18,114 +18,80 @@ export default function MainDashboard({ onLogout }) {
     setIsMobileMenuOpen(false);
   };
 
+  const navBtn = (tab, color, icon, text) => {
+    const isActive = currentTab === tab;
+    return (
+      <button 
+        onClick={() => handleTabChange(tab)} 
+        className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${isActive ? color : 'text-gray-300 hover:bg-[#3A3A3A]'}`}
+      >
+        {icon} {text}
+      </button>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header & Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Navbar đồng bộ Landing Page */}
+      <nav className="bg-[radial-gradient(circle_at_75%_10%,#5D5C5B_0%,#2B2B2B_35%,#111111_100%)] shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-black text-indigo-600 tracking-tight">FLOW</h1>
+            <div className="flex items-center gap-2">
+              <img src="/logo-flow.png" alt="FLOW Logo" className="h-8 w-auto object-contain" />
+              <h1 className="text-xl font-extrabold text-emerald-500 tracking-tight">F.L.O.W</h1>
             </div>
             
-            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-2">
-              <button onClick={() => handleTabChange('dashboard')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                📊 Tổng Quan
-              </button>
-              <button onClick={() => handleTabChange('nguonNhap')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                💰 Chi Tiêu
-              </button>
-              <button onClick={() => handleTabChange('doanhThu')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                📈 Doanh Thu
-              </button>
-              <button onClick={() =>handleTabChange('congNo')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'congNo' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                 📒 Công Nợ
-              </button>
+              {navBtn('dashboard', 'bg-indigo-600 text-white', '📊', 'Tổng Quan')}
+              {navBtn('nguonNhap', 'bg-blue-600 text-white', '💰', 'Chi Tiêu')}
+              {navBtn('doanhThu', 'bg-emerald-600 text-white', '📈', 'Doanh Thu')}
+              {navBtn('congNo', 'bg-orange-600 text-white', '📒', 'Công Nợ')}
+              {userInfo.loaiTaiKhoan === 'doanh_nghiep' && navBtn('khoHang', 'bg-amber-600 text-white', '📦', 'Kho Hàng')}
+              {navBtn('huongDan', 'bg-indigo-600 text-white', '⚙️', 'SePay')}
+              {navBtn('taiKhoan', 'bg-purple-600 text-white', '👤', 'Tài Khoản')}
               
-              {/* CHỈ HIỆN KHO HÀNG NẾU LÀ DOANH NGHIỆP */}
-              {userInfo.loaiTaiKhoan === 'doanh_nghiep' && (
-                <button onClick={() => handleTabChange('khoHang')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  📦 Kho Hàng
-                </button>
-              )}
-
-              <button onClick={() => handleTabChange('huongDan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                ⚙️ Tích hợp SePay
-              </button>
-              <button onClick={() => handleTabChange('taiKhoan')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                👤 Tài Khoản
-              </button>
-              
-              <button onClick={onLogout} className="ml-4 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition">
-                🚪 Đăng xuất
+              <button onClick={onLogout} className="ml-4 px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 hover:text-red-300 font-bold rounded-lg transition">
+                🚪 Thoát
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-500 hover:text-gray-700 focus:outline-none p-2">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-300 focus:outline-none p-2">
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  {isMobileMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
+                  {isMobileMenuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
                 </svg>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu Panel */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-gray-200 px-2 pt-2 pb-3 space-y-1 shadow-lg">
-            <button onClick={() => handleTabChange('dashboard')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-              📊 Tổng Quan
-            </button>
-            <button onClick={() => handleTabChange('nguonNhap')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'nguonNhap' ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-              💰 Chi Tiêu
-            </button>
-            <button onClick={() => handleTabChange('doanhThu')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'doanhThu' ? 'bg-emerald-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-              📈 Doanh Thu
-            </button>
-            <button onClick={() =>handleTabChange('congNo')} className={`px-3 py-2 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'congNo' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-                 📒 Công Nợ
-              </button>
-
-            {/* CHỈ HIỆN KHO HÀNG NẾU LÀ DOANH NGHIỆP */}
-            {userInfo.loaiTaiKhoan === 'doanh_nghiep' && (
-              <button onClick={() => handleTabChange('khoHang')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'khoHang' ? 'bg-amber-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                📦 Kho Hàng
-              </button>
-            )}
-
-            <button onClick={() => handleTabChange('huongDan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'huongDan' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-              ⚙️ Tích hợp SePay
-            </button>
-            <button onClick={() => handleTabChange('taiKhoan')} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition shadow-sm ${currentTab === 'taiKhoan' ? 'bg-purple-600 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-              👤 Tài Khoản
-            </button>
-            <button onClick={onLogout} className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 font-bold rounded-lg transition mt-2">
-              🚪 Đăng xuất
-            </button>
+          <div className="md:hidden bg-[#2B2B2B] border-t border-gray-700 px-2 pt-2 pb-3 space-y-1 shadow-lg">
+            <button onClick={() => handleTabChange('dashboard')} className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#3A3A3A]">📊 Tổng Quan</button>
+            <button onClick={() => handleTabChange('nguonNhap')} className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#3A3A3A]">💰 Chi Tiêu</button>
+            <button onClick={() => handleTabChange('doanhThu')} className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#3A3A3A]">📈 Doanh Thu</button>
+            <button onClick={() => handleTabChange('congNo')} className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#3A3A3A]">📒 Công Nợ</button>
+            {userInfo.loaiTaiKhoan === 'doanh_nghiep' && <button onClick={() => handleTabChange('khoHang')} className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#3A3A3A]">📦 Kho Hàng</button>}
+            <button onClick={() => handleTabChange('taiKhoan')} className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#3A3A3A]">👤 Tài Khoản</button>
+            <button onClick={onLogout} className="w-full text-left px-4 py-3 text-red-400 font-bold hover:bg-[#3A3A3A]">🚪 Thoát</button>
           </div>
         )}
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-4 sm:px-4 lg:px-6">
+      <main className="flex-grow max-w-7xl mx-auto w-full py-4 sm:px-4 lg:px-6">
         {currentTab === 'dashboard' && <Dashboard token={token} />}
         {currentTab === 'nguonNhap' && <NguonNhap token={token} />}
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}
         {currentTab === 'congNo' && <CongNo token={token} />}
-        
-        {/* CHẶN HIỂN THỊ COMPONENT NẾU KHÔNG PHẢI DOANH NGHIỆP */}
         {currentTab === 'khoHang' && userInfo.loaiTaiKhoan === 'doanh_nghiep' && <KhoHang token={token} />}
-        
         {currentTab === 'huongDan' && <HuongDanSePay />}
         {currentTab === 'taiKhoan' && <TaiKhoan token={token} />}
       </main>
+
+      {/* Footer đồng bộ Landing Page */}
+      <footer className="bg-gray-900 text-gray-400 py-6 text-center relative z-20 mt-auto">
+        <p className="text-sm">© 2026 F.L.O.W System. Phát triển bởi Trần Hà Gia Nghĩa.</p>
+      </footer>
     </div>
   );
 }

@@ -42,4 +42,25 @@ router.delete('/:id', verifyToken, async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// --- API NHẬP HÀNG LOẠT EXCEL CHO KHO HÀNG ---
+router.post('/bulk', verifyToken, async (req, res) => {
+    try {
+        const dataArray = req.body.data;
+        if (!dataArray || dataArray.length === 0) return res.status(400).json({ message: 'Không có dữ liệu!' });
+
+        const dataToSave = dataArray.map(item => ({
+            userId: req.user._id,
+            tenSanPham: item.tenSanPham || 'Sản phẩm mới',
+            soLuongTon: Number(item.soLuongTon) || 0,
+            donViTinh: item.donViTinh || 'Cái',
+            giaNhap: Number(item.giaNhap) || 0,
+            giaBan: Number(item.giaBan) || 0,
+            ngayCapNhat: new Date().toISOString().slice(0, 16).replace('T', ' ')
+        }));
+
+        await KhoHang.insertMany(dataToSave);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;

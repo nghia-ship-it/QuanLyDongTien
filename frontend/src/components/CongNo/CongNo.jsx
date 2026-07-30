@@ -8,20 +8,15 @@ const API_URL = 'https://quanlydongtien.onrender.com/api/congno';
 export default function CongNo({ token }) {
   const [list, setList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
-
   const config = { headers: { 'auth-token': token } };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       const res = await axios.get(API_URL, config);
       setList(res.data);
-    } catch (err) {
-      alert('Lỗi lấy dữ liệu công nợ!');
-    }
+    } catch (err) { alert('Lỗi lấy dữ liệu công nợ!'); }
   };
 
   const handleDelete = async (id) => {
@@ -33,9 +28,21 @@ export default function CongNo({ token }) {
     } catch (err) { alert('Lỗi xóa dữ liệu!'); }
   };
 
-  const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
+  const exportCSV = () => {
+    let csvContent = "\uFEFFMã Nợ,Loại Công Nợ,Đối Tác,Tiền Nợ,Đã Trả,Còn Lại,Trạng Thái\n";
+    list.forEach(r => {
+      const loai = r.loaiCongNo === 'khach_no' ? 'Phải thu' : 'Phải trả';
+      const conLai = r.soTienNo - r.soTienDaTra;
+      csvContent += `${r.id},${loai},${r.tenDoiTac},${r.soTienNo},${r.soTienDaTra},${conLai},${r.trangThai}\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `QuanLyCongNo.csv`;
+    link.click();
+  };
 
-  // Tính tổng để show lên Dashboard mini
+  const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
   const tongKhachNo = list.filter(i => i.loaiCongNo === 'khach_no').reduce((acc, curr) => acc + (curr.soTienNo - curr.soTienDaTra), 0);
   const tongNoDaiLy = list.filter(i => i.loaiCongNo === 'no_dai_ly').reduce((acc, curr) => acc + (curr.soTienNo - curr.soTienDaTra), 0);
 
@@ -47,22 +54,8 @@ export default function CongNo({ token }) {
           🔄 Làm mới Form
         </button>
       </div>
-
-      <CongNoForm 
-        token={token} 
-        onRefresh={fetchData} 
-        selectedItem={selectedItem} 
-        clearSelection={() => setSelectedItem(null)} 
-      />
-      
-      <CongNoTable 
-        list={list} 
-        onEdit={setSelectedItem} 
-        onDelete={handleDelete} 
-        formatMoney={formatMoney}
-        tongKhachNo={tongKhachNo}
-        tongNoDaiLy={tongNoDaiLy}
-      />
+      <CongNoForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportCSV} />
+      <CongNoTable list={list} onEdit={setSelectedItem} onDelete={handleDelete} formatMoney={formatMoney} tongKhachNo={tongKhachNo} tongNoDaiLy={tongNoDaiLy} />
     </div>
   );
 }

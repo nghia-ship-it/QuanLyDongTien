@@ -53,4 +53,33 @@ router.delete('/:id', verifyToken, async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// 5. API NHẬP HÀNG LOẠT EXCEL CHO CÔNG NỢ 
+router.post('/bulk', verifyToken, async (req, res) => {
+    try {
+        const dataArray = req.body.data;
+        if (!dataArray || dataArray.length === 0) return res.status(400).json({ message: 'Không có dữ liệu!' });
+
+        const dataToSave = dataArray.map(item => {
+            const soTienNo = Number(item.TienNo) || 0;
+            const soTienDaTra = Number(item.DaTra) || 0;
+            
+            let trangThai = 'Chưa thanh toán';
+            if (soTienDaTra > 0 && soTienDaTra < soTienNo) trangThai = 'Thanh toán một phần';
+            if (soTienDaTra >= soTienNo) trangThai = 'Đã hoàn tất';
+
+            return {
+                userId: req.user._id,
+                loaiCongNo: item.Loai === 'Mình nợ' ? 'no_dai_ly' : 'khach_no',
+                tenDoiTac: item.DoiTac || 'Khách Vãng Lai',
+                soTienNo, soTienDaTra, trangThai,
+                ngayGhiNo: item.NgayGhiNo || new Date().toISOString().slice(0, 10),
+                ngayHenTra: item.NgayHenTra || '', ghiChu: item.GhiChu || ''
+            };
+        });
+
+        await CongNo.insertMany(dataToSave);
+        res.json({ success: true, message: `Đã nhập thành công ${dataToSave.length} khoản nợ!` });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;
