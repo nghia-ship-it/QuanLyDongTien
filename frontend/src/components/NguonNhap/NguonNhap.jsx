@@ -53,14 +53,27 @@ export default function NguonNhap({ token }) {
       alert('Đã xóa dữ liệu thành công!');
       if (selectedItem && selectedItem.id === id) setSelectedItem(null);
       fetchGroupedData();
-      setSelectedNgay(null); // Đóng bảng chi tiết sau khi xóa cho an toàn
+      setSelectedNgay(null); 
     } catch (err) { alert('Lỗi xóa dữ liệu!'); }
   };
 
   const handleRefreshAfterSubmit = () => {
     fetchGroupedData();
     fetchNames();
-    setSelectedNgay(null); // Load data mới thì reset chi tiết
+    setSelectedNgay(null); 
+  };
+
+  // Hàm xuất Excel
+  const exportCSV = () => {
+    let csvContent = "\uFEFFNgày,Tổng Tiền Chi,Số Giao Dịch\n";
+    listGrouped.forEach(r => {
+      csvContent += `${r.ngayHienThi},${r.tongTienNgay},${r.soLanGiaoDich}\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `ChiTieu_Thang_${thang}_${nam}.csv`;
+    link.click();
   };
 
   const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
@@ -68,7 +81,6 @@ export default function NguonNhap({ token }) {
 
   return (
     <div className="p-6 bg-[#f0f4f8] min-h-screen">
-      {/* Header */}
       <div className="bg-[#1e78c8] p-4 rounded-xl text-white shadow-md flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-xl font-bold">💰 Quản Lý Nguồn Chi Tiêu</h2>
         <div className="flex gap-4 items-center">
@@ -92,6 +104,7 @@ export default function NguonNhap({ token }) {
         selectedItem={selectedItem} 
         clearSelection={() => setSelectedItem(null)} 
         listNames={listNames} 
+        onExport={exportCSV}
       />
 
       <NguonNhapTable 

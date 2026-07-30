@@ -7,7 +7,7 @@ const API_URL = 'https://quanlydongtien.onrender.com/api/khohang';
 
 export default function KhoHang({ token }) {
   const [list, setList] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null); // Lưu item đang chọn để sửa
+  const [selectedItem, setSelectedItem] = useState(null); 
 
   const config = { headers: { 'auth-token': token } };
 
@@ -29,9 +29,21 @@ export default function KhoHang({ token }) {
     try {
       await axios.delete(`${API_URL}/${id}`, config);
       alert('Đã xóa thành công!');
-      if (selectedItem && selectedItem.id === id) setSelectedItem(null); // Nếu đang chọn xóa luôn thì reset form
+      if (selectedItem && selectedItem.id === id) setSelectedItem(null); 
       fetchData();
     } catch (err) { alert('Lỗi xóa dữ liệu!'); }
+  };
+
+  const exportCSV = () => {
+    let csvContent = "\uFEFFMã,Tên Sản Phẩm,Tồn Kho,Đơn Vị,Giá Nhập,Giá Bán,Ngày Cập Nhật\n";
+    list.forEach(r => {
+      csvContent += `${r.id},${r.tenSanPham},${r.soLuongTon},${r.donViTinh},${r.giaNhap},${r.giaBan},${r.ngayCapNhat}\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `KhoHang_HienTai.csv`;
+    link.click();
   };
 
   const tongGiaTriKho = list.reduce((acc, curr) => acc + (curr.soLuongTon * curr.giaNhap), 0);
@@ -46,12 +58,12 @@ export default function KhoHang({ token }) {
         </button>
       </div>
 
-      {/* Gọi 2 Component con ra và truyền Props xuống cho tụi nó xài */}
       <KhoHangForm 
         token={token} 
         onRefresh={fetchData} 
         selectedItem={selectedItem} 
         clearSelection={() => setSelectedItem(null)} 
+        onExport={exportCSV}
       />
       
       <KhoHangTable 

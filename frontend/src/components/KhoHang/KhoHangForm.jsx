@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 
 const API_URL = 'https://quanlydongtien.onrender.com/api/khohang';
 
-export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelection }) {
+export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelection, onExport }) {
   const [tenSanPham, setTenSanPham] = useState('');
   const [soLuongTon, setSoLuongTon] = useState('');
   const [donViTinh, setDonViTinh] = useState('Cái');
@@ -12,8 +13,8 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
   const [ngayCapNhat, setNgayCapNhat] = useState(new Date().toISOString().slice(0, 16));
 
   const config = { headers: { 'auth-token': token } };
+  const fileInputRef = useRef(null);
 
-  // Lắng nghe xem thằng cha có quăng item nào vào để sửa không
   useEffect(() => {
     if (selectedItem) {
       setTenSanPham(selectedItem.tenSanPham);
@@ -42,6 +43,34 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
     setter(parseInt(rawStr).toLocaleString('vi-VN'));
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); 
+        const formattedData = data.map(item => ({
+          tenSanPham: item['Tên Sản Phẩm'] || item.TenSanPham || 'Sản phẩm mới',
+          soLuongTon: Number(item['Số Lượng'] || item.SoLuong || item.soLuongTon) || 0,
+          donViTinh: item['Đơn Vị'] || item.DonVi || item.donViTinh || 'Cái',
+          giaNhap: Number(item['Giá Nhập'] || item.GiaNhap || item.giaNhap) || 0,
+          giaBan: Number(item['Giá Bán'] || item.GiaBan || item.giaBan) || 0,
+          ngayCapNhat: item['Ngày Cập Nhật'] || item.NgayCapNhat || new Date().toISOString().slice(0, 16).replace('T', ' ')
+        }));
+        if(formattedData.length === 0) return alert("File rỗng!");
+        await axios.post(`${API_URL}/bulk`, { data: formattedData }, config);
+        alert(`🎉 Đã nhập thành công ${formattedData.length} sản phẩm từ Excel!`);
+        clearSelection();
+        onRefresh(); 
+      } catch (error) { alert('Lỗi file Excel!'); }
+      e.target.value = null; 
+    };
+    reader.readAsBinaryString(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -63,8 +92,8 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
         await axios.post(API_URL, payload, config);
         alert('Thêm mặt hàng mới thành công!');
       }
-      clearSelection(); // Bảo thằng cha reset lại selectedItem
-      onRefresh();      // Bảo thằng cha fetch lại data
+      clearSelection(); 
+      onRefresh();      
     } catch (err) { alert('Lỗi lưu dữ liệu!'); }
   };
 
@@ -92,14 +121,18 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
           <input type="text" value={giaBan} onChange={(e) => handleNumberChange(e.target.value, setGiaBan)} className="w-full border rounded p-2 focus:ring-1 focus:ring-amber-500 font-semibold text-emerald-600" />
         </div>
         
-        <div className="md:col-span-4">
+        <div className="md:col-span-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">Ngày cập nhật gần nhất:</label>
           <input type="datetime-local" value={ngayCapNhat} onChange={(e) => setNgayCapNhat(e.target.value)} className="border rounded p-2 focus:ring-1 focus:ring-amber-500 w-full" required />
         </div>
-        <div className="md:col-span-2 flex gap-2">
-          <button type="submit" className="w-full bg-amber-600 text-white font-bold p-2 rounded hover:bg-amber-700 transition shadow cursor-pointer">
-            {selectedItem ? '✏️ Cập Nhật Kho' : '➕ Nhập Kho Mới'}
+        
+        <div className="md:col-span-3 flex gap-2">
+          <button type="submit" className="flex-1 bg-amber-600 text-white font-bold p-2 rounded hover:bg-amber-700 transition shadow cursor-pointer">
+            {selectedItem ? '✏️ Cập Nhật' : '➕ Nhập Kho'}
           </button>
+          <button type="button" onClick={onExport} className="bg-cyan-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-cyan-700">📤 Xuất CSV</button>
+          <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+          <button type="button" onClick={() => fileInputRef.current.click()} className="bg-purple-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-purple-700">📥 Nhập Excel</button>
         </div>
       </form>
     </div>

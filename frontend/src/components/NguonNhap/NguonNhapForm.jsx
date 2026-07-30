@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 
 const API_URL = 'https://quanlydongtien.onrender.com/api/nguonnhap';
 
-export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSelection, listNames }) {
+export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSelection, listNames, onExport }) {
   const [tenNguon, setTenNguon] = useState('');
   const [soTien, setSoTien] = useState('');
   const [ghiChu, setGhiChu] = useState('');
@@ -11,8 +12,8 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
   const [suggestions, setSuggestions] = useState([]);
 
   const config = { headers: { 'auth-token': token } };
+  const fileInputRef = useRef(null);
 
-  // Lắng nghe cha truyền data xuống để sửa
   useEffect(() => {
     if (selectedItem) {
       setTenNguon(selectedItem.tenNguon);
@@ -46,6 +47,32 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
     setSuggestions(multipliers.map(m => (num * m).toLocaleString('vi-VN')));
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); 
+        const formattedData = data.map(item => ({
+          tenNguon: item['Tên Nguồn'] || item.TenNguon || 'Khác',
+          soTien: Number(item['Số Tiền'] || item.SoTien) || 0,
+          ghiChu: item['Ghi Chú'] || item.GhiChu || '',
+          ngayNhap: item['Ngày Nhập'] || item.NgayNhap || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00'
+        }));
+        if(formattedData.length === 0) return alert("File rỗng!");
+        await axios.post(`${API_URL}/bulk`, { data: formattedData }, config);
+        alert(`🎉 Đã nhập thành công ${formattedData.length} khoản chi từ Excel!`);
+        clearSelection();
+        onRefresh(); 
+      } catch (error) { alert('Lỗi file Excel!'); }
+      e.target.value = null; 
+    };
+    reader.readAsBinaryString(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const rawST = parseFloat(soTien.replace(/\./g, '')) || 0;
@@ -68,7 +95,7 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
         alert('Thêm nguồn nhập thành công!');
       }
       clearSelection();
-      onRefresh(); // Báo cho cha tải lại dữ liệu mới nhất
+      onRefresh(); 
     } catch (err) { alert('Lỗi lưu dữ liệu!'); }
   };
 
@@ -109,10 +136,17 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
           <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú:</label>
           <input type="text" value={ghiChu} onChange={(e) => setGhiChu(e.target.value)} placeholder="Nhập ghi chú nếu có..." className="w-full border rounded p-2 focus:ring-1 focus:ring-blue-500" />
         </div>
-        <div>
-          <button type="submit" className="w-full bg-blue-600 text-white font-bold p-2 rounded hover:bg-blue-700 transition shadow cursor-pointer">
-            {selectedItem ? '✏️ Cập nhật' : '➕ Thêm & Nhập số liệu'}
+        
+        <div className="flex gap-2">
+          <button type="submit" className="flex-1 bg-blue-600 text-white font-bold p-2 rounded hover:bg-blue-700 transition shadow cursor-pointer">
+            {selectedItem ? '✏️ Cập nhật' : '➕ Thêm'}
           </button>
+        </div>
+        
+        <div className="md:col-span-5 flex justify-end gap-2 mt-2">
+          <button type="button" onClick={onExport} className="bg-cyan-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-cyan-700">📤 Xuất CSV</button>
+          <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+          <button type="button" onClick={() => fileInputRef.current.click()} className="bg-purple-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-purple-700">📥 Nhập Excel</button>
         </div>
       </form>
     </div>
