@@ -152,4 +152,27 @@ router.post('/forgot-password', async (req, res) => {
     }
 });
 
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        if (!token) return res.status(400).json({ message: 'Thiếu vé xác thực!' });
+
+        // Giải mã token xem có hợp lệ và còn hạn không
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'BiMatCuaTao');
+        
+        // Tìm user dựa vào ID trong token
+        const user = await User.findById(verified.id);
+        if (!user) return res.status(400).json({ message: 'Không tìm thấy tài khoản!' });
+
+        // Mã hóa mật khẩu mới và lưu lại
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({ message: 'Đổi mật khẩu thành công! Bạn có thể đăng nhập ngay.' });
+    } catch (error) {
+        res.status(400).json({ message: 'Đường dẫn đã hết hạn hoặc không hợp lệ. Vui lòng gửi lại yêu cầu!' });
+    }
+});
+
 module.exports = router;

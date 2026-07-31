@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './components/auth/Auth';
 import LandingPage from './components/LandingPage';
 import MainDashboard from './components/MainDashboard';
+import ResetPassword from './components/auth/ResetPassword';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/login" element={!token ? <Auth onLoginSuccess={handleLoginSuccess} /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!token ? <Auth onLoginSuccess={handleLoginSuccess} /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={token ? <MainDashboard onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/reset-password" element={<ResetPassword/>}/>
       </Routes>
     </BrowserRouter>
   );
