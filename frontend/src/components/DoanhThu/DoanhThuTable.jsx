@@ -3,8 +3,8 @@ import React from 'react';
 export default function DoanhThuTable({ list, onEdit, onDelete, formatMoney, tongThang, thang }) {
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border border-white/20">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      <div className="overflow-x-auto w-full pb-4">
+        <table className="w-full text-left border-collapse min-w-[800px] whitespace-nowrap">
           <thead>
             <tr className="bg-[#14a064] text-white text-sm font-bold uppercase">
               <th className="p-4">Ngày/Giờ Nhập</th>

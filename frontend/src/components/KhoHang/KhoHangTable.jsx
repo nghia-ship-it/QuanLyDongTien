@@ -3,8 +3,8 @@ import React from 'react';
 export default function KhoHangTable({ list, onEdit, onDelete, tongGiaTriKho, formatMoney }) {
   return (
     <div className="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+     <div className="overflow-x-auto w-full pb-4">
+        <table className="w-full text-left border-collapse min-w-[800px] whitespace-nowrap">
           <thead>
             <tr className="bg-[#f59e0b] text-white text-sm font-bold uppercase">
               <th className="p-3">Tên Sản Phẩm</th>

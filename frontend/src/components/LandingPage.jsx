@@ -4,18 +4,20 @@ import { Link } from 'react-router-dom';
 export default function LandingPage() {
   return (
     <div className="bg-white min-h-screen font-sans overflow-x-hidden">
-      {/* Header / Navbar */}
-      <nav className="flex justify-between items-center p-6 bg-[radial-gradient(circle_at_75%_10%,#5D5C5B_0%,#2B2B2B_35%,#111111_100%)] shadow-sm relative z-50">
+     {/* Header / Navbar */}
+      <nav className="flex justify-between items-center p-4 md:p-6 bg-[radial-gradient(circle_at_75%_10%,#5D5C5B_0%,#2B2B2B_35%,#111111_100%)] shadow-sm relative z-50">
         <div className="flex items-center gap-2">
-          <img src="/favicon.png" alt="FLOW Logo" className="h-10 w-auto object-contain" />
-          <h1 className="text-2xl font-extrabold text-emerald-600 tracking-tight">F.L.O.W</h1>
+          <img src="/favicon.png" alt="FLOW Logo" className="h-8 md:h-10 w-auto object-contain" />
+          <h1 className="text-xl md:text-2xl font-extrabold text-emerald-600 tracking-tight">F.L.O.W</h1>
         </div>
-        <div>
-          <Link to="/login" className="text-white hover:text-emerald-600 mr-6 font-medium transition">
+        <div className="flex items-center gap-3 md:gap-6">
+          <Link to="/login" className="text-white hover:text-emerald-600 font-medium transition text-sm md:text-base whitespace-nowrap">
             Đăng nhập
           </Link>
-          <Link to="/register" className="bg-emerald-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-emerald-700 transition shadow-md">
-            Đăng ký miễn phí
+          <Link to="/register" className="bg-emerald-600 text-white px-3 py-2 md:px-6 md:py-2.5 rounded-lg font-medium hover:bg-emerald-700 transition shadow-md text-sm md:text-base whitespace-nowrap">
+            {/* Chữ ngắn trên mobile, chữ dài trên PC */}
+            <span className="block sm:hidden">Đăng ký</span>
+            <span className="hidden sm:block">Đăng ký miễn phí</span>
           </Link>
         </div>
       </nav>

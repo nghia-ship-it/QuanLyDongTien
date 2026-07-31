@@ -33,8 +33,8 @@ export default function CongNoTable({ list, onEdit, onDelete, formatMoney, tongK
       </div>
 
       <div className="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto w-full pb-4">
+          <table className="w-full text-left border-collapse min-w-[800px] whitespace-nowrap">
             <thead>
               <tr className="bg-gray-100 text-gray-700 text-sm font-bold uppercase border-b">
                 <th className="p-4">Đối Tác</th>
