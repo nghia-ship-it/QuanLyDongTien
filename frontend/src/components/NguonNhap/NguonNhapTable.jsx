@@ -51,6 +51,7 @@ export default function NguonNhapTable({ listGrouped, detailList, selectedNgay, 
           {selectedNgay ? `📅 Chi tiết ngày: ${selectedNgay}` : '👈 Hãy bấm vào một ngày ở bảng bên để xem chi tiết'}
         </div>
         {selectedNgay && (
+          <div className="overflow-x-auto w-full pb-4">
           <table className="w-full text-left border-collapse text-sm min-w-[600px] whitespace-nowrap">
             <thead>
               <tr className="bg-gray-100 text-gray-700 text-xs font-bold uppercase border-b">
@@ -90,6 +91,7 @@ export default function NguonNhapTable({ listGrouped, detailList, selectedNgay, 
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
