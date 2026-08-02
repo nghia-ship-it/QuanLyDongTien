@@ -56,7 +56,7 @@ export default function MainDashboard({ onLogout }) {
               {navBtn('taiKhoan', 'bg-purple-600 text-white', '👤', 'Tài Khoản')}
               
               <button onClick={onLogout} className="ml-4 px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 hover:text-red-300 font-bold rounded-lg transition">
-                🚪 Thoát
+                🚪 Đăng xuất
               </button>
             </div>
 
