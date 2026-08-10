@@ -79,17 +79,59 @@ export default function DoanhThuForm({ token, onRefresh, selectedItem, clearSele
     reader.onload = async (evt) => {
       try {
         const bstr = evt.target.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wb = XLSX.read(bstr, { type: 'binary', cellDates: true });
         const wsname = wb.SheetNames[0]; 
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws); 
         
-        const formattedData = data.map(row => {
-          const vals = Object.values(row);
+        const formatLocal = (d) => {
+          if (!d || isNaN(d.getTime())) return null;
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mi = String(d.getMinutes()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd} ${hh}:${mi}:00`;
+        };
+
+        const parseDate = (val) => {
+          if (!val) return formatLocal(new Date());
+          if (val instanceof Date) {
+             const loc = formatLocal(val);
+             if (loc) return loc;
+          }
+          if (typeof val === 'number') {
+             const d = new Date((val - 25569) * 86400 * 1000);
+             const loc = formatLocal(d);
+             if (loc) return loc;
+          }
+          if (typeof val === 'string') {
+             let d = new Date(val);
+             if (val.includes('/')) {
+                const parts = val.split('/');
+                if (parts.length === 3) {
+                   const y = parts[2].length === 4 ? parts[2] : parts[0];
+                   const m = parts[1];
+                   const dd = parts[2].length === 4 ? parts[0] : parts[2];
+                   d = new Date(`${y}-${m}-${dd}`);
+                }
+             }
+             const loc = formatLocal(d);
+             if (loc) return loc;
+          }
+          return formatLocal(new Date());
+        };
+
+        const formattedData = data.map(item => {
+          const vals = Object.values(item);
+          const rawNgay = item.NgayNhap || item['Ngày Nhập'] || item.ngayNhap || vals[0];
+          const rawTM = item.TienMat || item['Tiền Mặt'] || item.tienMat || vals[1];
+          const rawCK = item.ChuyenKhoan || item['Chuyển Khoản'] || item.chuyenKhoan || vals[2];
+
           return {
-            ngayNhap: row.NgayNhap || row['Ngày Nhập'] || vals[0] || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00',
-            tienMat: Number(row.TienMat || row['Tiền Mặt'] || vals[1]) || 0,
-            chuyenKhoan: Number(row.ChuyenKhoan || row['Chuyển Khoản'] || vals[2]) || 0,
+            ngayNhap: parseDate(rawNgay),
+            tienMat: Number(String(rawTM || 0).replace(/,/g, '')) || 0,
+            chuyenKhoan: Number(String(rawCK || 0).replace(/,/g, '')) || 0,
           };
         });
 

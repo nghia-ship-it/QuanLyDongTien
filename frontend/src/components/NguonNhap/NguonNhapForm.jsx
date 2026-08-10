@@ -54,17 +54,62 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
     reader.onload = async (evt) => {
       try {
         const bstr = evt.target.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wb = XLSX.read(bstr, { type: 'binary', cellDates: true });
         const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); 
+        
+        const formatLocal = (d) => {
+          if (!d || isNaN(d.getTime())) return null;
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mi = String(d.getMinutes()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd} ${hh}:${mi}:00`;
+        };
+
+        const parseDate = (val) => {
+          if (!val) return formatLocal(new Date());
+          if (val instanceof Date) {
+             const loc = formatLocal(val);
+             if (loc) return loc;
+          }
+          if (typeof val === 'number') {
+             const d = new Date((val - 25569) * 86400 * 1000);
+             const loc = formatLocal(d);
+             if (loc) return loc;
+          }
+          if (typeof val === 'string') {
+             let d = new Date(val);
+             if (val.includes('/')) {
+                const parts = val.split('/');
+                if (parts.length === 3) {
+                   const y = parts[2].length === 4 ? parts[2] : parts[0];
+                   const m = parts[1];
+                   const dd = parts[2].length === 4 ? parts[0] : parts[2];
+                   d = new Date(`${y}-${m}-${dd}`);
+                }
+             }
+             const loc = formatLocal(d);
+             if (loc) return loc;
+          }
+          return formatLocal(new Date());
+        };
+
         const formattedData = data.map(item => {
           const vals = Object.values(item);
+          const rawTen = item['Tên Nguồn'] || item.TenNguon || item.tenNguon || vals[0];
+          const rawTien = item['Số Tiền'] || item.SoTien || item.soTien || vals[1];
+          const rawGhiChu = item['Ghi Chú'] || item.GhiChu || item.ghiChu || vals[2];
+          const rawNgay = item['Ngày Nhập'] || item.NgayNhap || item.ngayNhap || vals[3];
+
           return {
-            tenNguon: item['Tên Nguồn'] || item.TenNguon || vals[0] || 'Khác',
-            soTien: Number(item['Số Tiền'] || item.SoTien || vals[1]) || 0,
-            ghiChu: item['Ghi Chú'] || item.GhiChu || vals[2] || '',
-            ngayNhap: item['Ngày Nhập'] || item.NgayNhap || vals[3] || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00'
+            tenNguon: String(rawTen || 'Khác').trim(),
+            soTien: Number(String(rawTien || 0).replace(/,/g, '')) || 0,
+            ghiChu: String(rawGhiChu || '').trim(),
+            ngayNhap: parseDate(rawNgay)
           };
         });
+
         if(formattedData.length === 0) return alert("File rỗng!");
         await axios.post(`${API_URL}/bulk`, { data: formattedData }, config);
         alert(`🎉 Đã nhập thành công ${formattedData.length} khoản chi từ Excel!`);
