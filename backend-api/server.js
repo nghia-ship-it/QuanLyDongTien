@@ -30,7 +30,11 @@ app.use('/api/webhook', webhookRoute);
 app.use('/api/congno', congNoRoute);
 
 // 4. CHẠY SERVER
-const PORT = process.env.PORT || 5000;
+app.get('/', (req, res) => {
+    res.send('Backend API Quản Lý Dòng Tiền đang chạy!');
+});
+
+const PORT = parseInt(process.env.PORT) || 5000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log('Server đang chạy ở cổng ' + PORT);
 });
