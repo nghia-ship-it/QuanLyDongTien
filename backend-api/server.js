@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -8,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // 1. KẾT NỐI MONGODB
-const MONGO_URI = "mongodb+srv://admin:Alo123456@cluster0.upycxci.mongodb.net/QuanLyDongTien?appName=Cluster0"; 
+const MONGO_URI = process.env.MONGO_URI; 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ Đã kết nối MongoDB Cloud rực rỡ!'))
     .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
