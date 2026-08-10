@@ -106,16 +106,21 @@ export default function DoanhThuForm({ token, onRefresh, selectedItem, clearSele
              if (loc) return loc;
           }
           if (typeof val === 'string') {
-             let d = new Date(val);
-             if (val.includes('/')) {
-                const parts = val.split('/');
-                if (parts.length === 3) {
-                   const y = parts[2].length === 4 ? parts[2] : parts[0];
-                   const m = parts[1];
-                   const dd = parts[2].length === 4 ? parts[0] : parts[2];
-                   d = new Date(`${y}-${m}-${dd}`);
-                }
+             const str = val.trim();
+             // DD/MM/YYYY
+             const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+             if (match) {
+                const [_, dd, mm, yyyy, hh, mi, ss] = match;
+                return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')} ${(hh||'00').padStart(2,'0')}:${(mi||'00').padStart(2,'0')}:${(ss||'00').padStart(2,'0')}`;
              }
+             // YYYY-MM-DD
+             const match2 = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+             if (match2) {
+                const [_, yyyy, mm, dd, hh, mi, ss] = match2;
+                return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')} ${(hh||'00').padStart(2,'0')}:${(mi||'00').padStart(2,'0')}:${(ss||'00').padStart(2,'0')}`;
+             }
+             // Fallback
+             const d = new Date(val);
              const loc = formatLocal(d);
              if (loc) return loc;
           }
