@@ -129,7 +129,7 @@ export default function DoanhThuForm({ token, onRefresh, selectedItem, clearSele
 
         const formattedData = data.map(item => {
           const vals = Object.values(item);
-          const rawNgay = item.NgayNhap || item['Ngày Nhập'] || item.ngayNhap || vals[0];
+          const rawNgay = item.NgayNhap || item['Ngày Nhập'] || item.ngayNhap || item['Ngày Giờ'] || item['Ngày'] || item.Date || vals[0];
           const rawTM = item.TienMat || item['Tiền Mặt'] || item.tienMat || vals[1];
           const rawCK = item.ChuyenKhoan || item['Chuyển Khoản'] || item.chuyenKhoan || vals[2];
 

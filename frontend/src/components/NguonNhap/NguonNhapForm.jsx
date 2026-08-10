@@ -105,7 +105,7 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
           const rawTen = item['Tên Nguồn'] || item.TenNguon || item.tenNguon || vals[0];
           const rawTien = item['Số Tiền'] || item.SoTien || item.soTien || vals[1];
           const rawGhiChu = item['Ghi Chú'] || item.GhiChu || item.ghiChu || vals[2];
-          const rawNgay = item['Ngày Nhập'] || item.NgayNhap || item.ngayNhap || vals[3];
+          const rawNgay = item['Ngày Nhập'] || item.NgayNhap || item.ngayNhap || item['Ngày Giờ'] || item['Ngày'] || item.Date || vals[3];
 
           return {
             tenNguon: String(rawTen || 'Khác').trim(),
