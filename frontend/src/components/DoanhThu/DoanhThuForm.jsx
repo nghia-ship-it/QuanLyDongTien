@@ -84,11 +84,14 @@ export default function DoanhThuForm({ token, onRefresh, selectedItem, clearSele
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws); 
         
-        const formattedData = data.map(row => ({
-          ngayNhap: row.NgayNhap || row['Ngày Nhập'] || '',
-          tienMat: Number(row.TienMat || row['Tiền Mặt']) || 0,
-          chuyenKhoan: Number(row.ChuyenKhoan || row['Chuyển Khoản']) || 0,
-        }));
+        const formattedData = data.map(row => {
+          const vals = Object.values(row);
+          return {
+            ngayNhap: row.NgayNhap || row['Ngày Nhập'] || vals[0] || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00',
+            tienMat: Number(row.TienMat || row['Tiền Mặt'] || vals[1]) || 0,
+            chuyenKhoan: Number(row.ChuyenKhoan || row['Chuyển Khoản'] || vals[2]) || 0,
+          };
+        });
 
         if(formattedData.length === 0) return alert("File rỗng hoặc sai định dạng cột!");
 

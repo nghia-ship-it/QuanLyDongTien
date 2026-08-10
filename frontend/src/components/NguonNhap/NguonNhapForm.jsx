@@ -56,12 +56,15 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
         const bstr = evt.target.result;
         const wb = XLSX.read(bstr, { type: 'binary' });
         const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); 
-        const formattedData = data.map(item => ({
-          tenNguon: item['Tên Nguồn'] || item.TenNguon || 'Khác',
-          soTien: Number(item['Số Tiền'] || item.SoTien) || 0,
-          ghiChu: item['Ghi Chú'] || item.GhiChu || '',
-          ngayNhap: item['Ngày Nhập'] || item.NgayNhap || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00'
-        }));
+        const formattedData = data.map(item => {
+          const vals = Object.values(item);
+          return {
+            tenNguon: item['Tên Nguồn'] || item.TenNguon || vals[0] || 'Khác',
+            soTien: Number(item['Số Tiền'] || item.SoTien || vals[1]) || 0,
+            ghiChu: item['Ghi Chú'] || item.GhiChu || vals[2] || '',
+            ngayNhap: item['Ngày Nhập'] || item.NgayNhap || vals[3] || new Date().toISOString().slice(0, 16).replace('T', ' ') + ':00'
+          };
+        });
         if(formattedData.length === 0) return alert("File rỗng!");
         await axios.post(`${API_URL}/bulk`, { data: formattedData }, config);
         alert(`🎉 Đã nhập thành công ${formattedData.length} khoản chi từ Excel!`);

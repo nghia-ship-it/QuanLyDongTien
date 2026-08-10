@@ -52,14 +52,17 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
         const bstr = evt.target.result;
         const wb = XLSX.read(bstr, { type: 'binary' });
         const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); 
-        const formattedData = data.map(item => ({
-          tenSanPham: item['Tên Sản Phẩm'] || item.TenSanPham || 'Sản phẩm mới',
-          soLuongTon: Number(item['Số Lượng'] || item.SoLuong || item.soLuongTon) || 0,
-          donViTinh: item['Đơn Vị'] || item.DonVi || item.donViTinh || 'Cái',
-          giaNhap: Number(item['Giá Nhập'] || item.GiaNhap || item.giaNhap) || 0,
-          giaBan: Number(item['Giá Bán'] || item.GiaBan || item.giaBan) || 0,
-          ngayCapNhat: item['Ngày Cập Nhật'] || item.NgayCapNhat || new Date().toISOString().slice(0, 16).replace('T', ' ')
-        }));
+        const formattedData = data.map(item => {
+          const vals = Object.values(item);
+          return {
+            tenSanPham: item['Tên Sản Phẩm'] || item.TenSanPham || vals[0] || 'Sản phẩm mới',
+            soLuongTon: Number(item['Số Lượng'] || item.SoLuong || item.soLuongTon || vals[1]) || 0,
+            donViTinh: item['Đơn Vị'] || item.DonVi || item.donViTinh || vals[2] || 'Cái',
+            giaNhap: Number(item['Giá Nhập'] || item.GiaNhap || item.giaNhap || vals[3]) || 0,
+            giaBan: Number(item['Giá Bán'] || item.GiaBan || item.giaBan || vals[4]) || 0,
+            ngayCapNhat: item['Ngày Cập Nhật'] || item.NgayCapNhat || vals[5] || new Date().toISOString().slice(0, 16).replace('T', ' ')
+          };
+        });
         if(formattedData.length === 0) return alert("File rỗng!");
         await axios.post(`${API_URL}/bulk`, { data: formattedData }, config);
         alert(`🎉 Đã nhập thành công ${formattedData.length} sản phẩm từ Excel!`);

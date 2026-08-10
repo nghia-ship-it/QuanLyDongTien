@@ -50,15 +50,18 @@ export default function CongNoForm({ token, onRefresh, selectedItem, clearSelect
         const bstr = evt.target.result;
         const wb = XLSX.read(bstr, { type: 'binary' });
         const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); 
-        const formattedData = data.map(item => ({
-          TienNo: item['Tiền Nợ'] || item.TienNo || 0,
-          DaTra: item['Đã Trả'] || item.DaTra || 0,
-          Loai: item['Loại'] || item.Loai || 'khach_no',
-          DoiTac: item['Đối Tác'] || item.DoiTac || 'Khách Vãng Lai',
-          NgayGhiNo: item['Ngày Ghi Nợ'] || item.NgayGhiNo || new Date().toISOString().slice(0, 10),
-          NgayHenTra: item['Ngày Hẹn Trả'] || item.NgayHenTra || '',
-          GhiChu: item['Ghi Chú'] || item.GhiChu || ''
-        }));
+        const formattedData = data.map(item => {
+          const vals = Object.values(item);
+          return {
+            TienNo: Number(item['Tiền Nợ'] || item.TienNo || vals[2]) || 0,
+            DaTra: Number(item['Đã Trả'] || item.DaTra || vals[3]) || 0,
+            Loai: item['Loại'] || item.Loai || vals[0] || 'khach_no',
+            DoiTac: item['Đối Tác'] || item.DoiTac || vals[1] || 'Khách Vãng Lai',
+            NgayGhiNo: item['Ngày Ghi Nợ'] || item.NgayGhiNo || vals[4] || new Date().toISOString().slice(0, 10),
+            NgayHenTra: item['Ngày Hẹn Trả'] || item.NgayHenTra || vals[5] || '',
+            GhiChu: item['Ghi Chú'] || item.GhiChu || vals[6] || ''
+          };
+        });
         if(formattedData.length === 0) return alert("File rỗng!");
         await axios.post(`${API_URL}/bulk`, { data: formattedData }, config);
         alert(`🎉 Đã nhập thành công ${formattedData.length} khoản nợ từ Excel!`);
