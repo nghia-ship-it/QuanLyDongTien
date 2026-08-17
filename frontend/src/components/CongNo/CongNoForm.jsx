@@ -135,7 +135,7 @@ export default function CongNoForm({ token, onRefresh, selectedItem, clearSelect
           <button type="submit" className="flex-1 bg-orange-600 text-white font-bold p-3 rounded-lg hover:bg-orange-700 transition shadow-md">
             {selectedItem ? '✏️ Lưu Cập Nhật' : '➕ Tạo Khoản Nợ Mới'}
           </button>
-          <button type="button" onClick={onExport} className="bg-cyan-600 text-white font-bold p-3 px-4 rounded-lg shadow-md hover:bg-cyan-700">📤 Xuất</button>
+          <button type="button" onClick={onExport} className="bg-emerald-600 text-white font-bold p-3 px-4 rounded-lg shadow-md hover:bg-emerald-700">📤 Xuất Excel</button>
           <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
           <button type="button" onClick={() => fileInputRef.current.click()} className="bg-purple-600 text-white font-bold p-3 px-4 rounded-lg shadow-md hover:bg-purple-700">📥 Nhập Excel</button>
         </div>
