@@ -197,7 +197,7 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
         </div>
         
         <div className="md:col-span-5 flex justify-end gap-2 mt-2">
-          <button type="button" onClick={onExport} className="bg-cyan-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-cyan-700">📤 Xuất CSV</button>
+          <button type="button" onClick={onExport} className="bg-emerald-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-emerald-700">📤 Xuất Excel</button>
           <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
           <button type="button" onClick={() => fileInputRef.current.click()} className="bg-purple-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-purple-700">📥 Nhập Excel</button>
         </div>

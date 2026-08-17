@@ -188,8 +188,8 @@ export default function DoanhThuForm({ token, onRefresh, selectedItem, clearSele
             {selectedItem ? '✏️ Sửa' : '➕ Thêm'}
           </button>
           
-          <button type="button" onClick={onExport} className="bg-cyan-600 text-white font-bold p-2 px-3 rounded hover:bg-cyan-700 transition shadow">
-            📤 Xuất
+          <button type="button" onClick={onExport} className="bg-emerald-600 text-white font-bold p-2 px-3 rounded hover:bg-emerald-700 transition shadow">
+            📤 Xuất Excel
           </button>
           
           {/* Nút Nhập Excel Ẩn */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 import KhoHangForm from './KhoHangForm';
 import KhoHangTable from './KhoHangTable';
 
@@ -29,16 +30,53 @@ export default function KhoHang({ token }) {
     } catch (err) { alert('Lỗi xóa dữ liệu!'); }
   };
 
-  const exportCSV = () => {
-    let csvContent = "\uFEFFMã,Tên Sản Phẩm,Tồn Kho,Đơn Vị,Giá Nhập,Giá Bán,Ngày Cập Nhật\n";
-    list.forEach(r => {
-      csvContent += `${r.id},${r.tenSanPham},${r.soLuongTon},${r.donViTinh},${r.giaNhap},${r.giaBan},${r.ngayCapNhat}\n`;
-    });
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `KhoHang_HienTai.csv`;
-    link.click();
+  const exportExcel = () => {
+    try {
+      if (list.length === 0) return alert('Không có dữ liệu để xuất!');
+
+      const wb = XLSX.utils.book_new();
+      const fmtNum = (n) => new Intl.NumberFormat('vi-VN').format(n || 0);
+
+      // --- Sheet 1: Kho Hàng ---
+      const headerKH = ['STT', 'Tên Sản Phẩm', 'Tồn Kho', 'Đơn Vị', 'Giá Nhập (VND)', 'Giá Bán (VND)', 'Giá Trị Tồn (VND)', 'Ngày Cập Nhật'];
+      const dataKH = list.map((r, i) => [
+        i + 1,
+        r.tenSanPham,
+        r.soLuongTon,
+        r.donViTinh,
+        fmtNum(r.giaNhap),
+        fmtNum(r.giaBan),
+        fmtNum(r.soLuongTon * r.giaNhap),
+        r.ngayCapNhat || ''
+      ]);
+
+      const ws1 = XLSX.utils.aoa_to_sheet([headerKH, ...dataKH]);
+      ws1['!cols'] = [{ wch: 5 }, { wch: 24 }, { wch: 10 }, { wch: 8 }, { wch: 16 }, { wch: 16 }, { wch: 18 }, { wch: 18 }];
+      XLSX.utils.book_append_sheet(wb, ws1, 'Kho Hàng');
+
+      // --- Sheet 2: Tổng Kết ---
+      const tongGiaTriKho = list.reduce((acc, curr) => acc + (curr.soLuongTon * curr.giaNhap), 0);
+      const tongGiaTriBan = list.reduce((acc, curr) => acc + (curr.soLuongTon * curr.giaBan), 0);
+      const wsTK = XLSX.utils.aoa_to_sheet([
+        ['BÁO CÁO KHO HÀNG'],
+        [],
+        ['Chỉ tiêu', 'Giá trị'],
+        ['Tổng số mặt hàng', list.length],
+        ['Tổng giá trị kho (theo giá nhập)', fmtNum(tongGiaTriKho) + ' VND'],
+        ['Tổng giá trị kho (theo giá bán)', fmtNum(tongGiaTriBan) + ' VND'],
+        ['Chênh lệch (Lãi tiềm năng)', fmtNum(tongGiaTriBan - tongGiaTriKho) + ' VND'],
+        [],
+        ['Ngày xuất báo cáo', new Date().toLocaleDateString('vi-VN')]
+      ]);
+      wsTK['!cols'] = [{ wch: 34 }, { wch: 22 }];
+      XLSX.utils.book_append_sheet(wb, wsTK, 'Tổng Kết');
+
+      const fileName = `BaoCao_KhoHang_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi khi xuất file Excel!');
+    }
   };
 
   const tongGiaTriKho = list.reduce((acc, curr) => acc + (curr.soLuongTon * curr.giaNhap), 0);
@@ -53,7 +91,7 @@ export default function KhoHang({ token }) {
         </button>
       </div>
 
-      <KhoHangForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportCSV} />
+      <KhoHangForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportExcel} />
       <KhoHangTable list={list} onEdit={setSelectedItem} onDelete={handleDelete} tongGiaTriKho={tongGiaTriKho} formatMoney={formatMoney} />
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 import DoanhThuForm from './DoanhThuForm';
 import DoanhThuTable from './DoanhThuTable';
 
@@ -35,16 +36,53 @@ export default function DoanhThu({ token }) {
     } catch (err) { alert('Lỗi xóa dữ liệu!'); }
   };
 
-  const exportCSV = () => {
-    let csvContent = "\uFEFFMã,Ngày Giờ,Tiền Mặt,Chuyển Khoản,Tổng Cộng\n";
-    list.forEach(r => {
-      csvContent += `${r.id},${r.ngayNhap},${r.tienMat},${r.chuyenKhoan},${r.tongCong}\n`;
-    });
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `DoanhThu_${thang}_${nam}.csv`;
-    link.click();
+  const exportExcel = () => {
+    try {
+      if (list.length === 0) return alert('Không có dữ liệu để xuất!');
+
+      const wb = XLSX.utils.book_new();
+      const fmtNum = (n) => new Intl.NumberFormat('vi-VN').format(n || 0);
+
+      // --- Sheet 1: Doanh Thu Chi Tiết ---
+      const tongTM = list.reduce((a, c) => a + (c.tienMat || 0), 0);
+      const tongCK = list.reduce((a, c) => a + (c.chuyenKhoan || 0), 0);
+      const tongTC = list.reduce((a, c) => a + (c.tongCong || 0), 0);
+
+      const headerDT = ['STT', 'Ngày Giờ', 'Tiền Mặt (VND)', 'Chuyển Khoản (VND)', 'Tổng Cộng (VND)'];
+      const dataDT = list.map((r, i) => [
+        i + 1,
+        r.ngayNhap,
+        fmtNum(r.tienMat),
+        fmtNum(r.chuyenKhoan),
+        fmtNum(r.tongCong)
+      ]);
+      dataDT.push(['', 'TỔNG CỘNG', fmtNum(tongTM), fmtNum(tongCK), fmtNum(tongTC)]);
+
+      const ws1 = XLSX.utils.aoa_to_sheet([headerDT, ...dataDT]);
+      ws1['!cols'] = [{ wch: 5 }, { wch: 20 }, { wch: 18 }, { wch: 20 }, { wch: 18 }];
+      XLSX.utils.book_append_sheet(wb, ws1, 'Doanh Thu');
+
+      // --- Sheet 2: Tổng Kết ---
+      const wsTK = XLSX.utils.aoa_to_sheet([
+        [`BÁO CÁO DOANH THU THÁNG ${thang}/${nam}`],
+        [],
+        ['Chỉ tiêu', 'Giá trị (VND)'],
+        ['Tổng Tiền Mặt', fmtNum(tongTM)],
+        ['Tổng Chuyển Khoản', fmtNum(tongCK)],
+        ['Tổng Doanh Thu', fmtNum(tongTC)],
+        ['Số giao dịch', list.length],
+        [],
+        ['Ngày xuất báo cáo', new Date().toLocaleDateString('vi-VN')]
+      ]);
+      wsTK['!cols'] = [{ wch: 22 }, { wch: 22 }];
+      XLSX.utils.book_append_sheet(wb, wsTK, 'Tổng Kết');
+
+      const fileName = `BaoCao_DoanhThu_Thang${thang}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi khi xuất file Excel!');
+    }
   };
 
   const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
@@ -78,7 +116,7 @@ export default function DoanhThu({ token }) {
         onRefresh={fetchData} 
         selectedItem={selectedItem} 
         clearSelection={() => setSelectedItem(null)} 
-        onExport={exportCSV} 
+        onExport={exportExcel} 
       />
 
       <DoanhThuTable 

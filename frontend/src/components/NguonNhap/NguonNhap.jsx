@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 import NguonNhapForm from './NguonNhapForm';
 import NguonNhapTable from './NguonNhapTable';
 
@@ -62,16 +63,49 @@ export default function NguonNhap({ token }) {
     setSelectedNgay(null); 
   };
 
-  const exportCSV = () => {
-    let csvContent = "\uFEFFNgày,Tổng Tiền Chi,Số Giao Dịch\n";
-    listGrouped.forEach(r => {
-      csvContent += `${r.ngayHienThi},${r.tongTienNgay},${r.soLanGiaoDich}\n`;
-    });
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `ChiTieu_Thang_${thang}_${nam}.csv`;
-    link.click();
+  const exportExcel = () => {
+    try {
+      if (listGrouped.length === 0) return alert('Không có dữ liệu để xuất!');
+
+      const wb = XLSX.utils.book_new();
+      const fmtNum = (n) => new Intl.NumberFormat('vi-VN').format(n || 0);
+
+      // --- Sheet 1: Tổng Hợp Ngày ---
+      const headerNN = ['STT', 'Ngày', 'Tổng Tiền Chi (VND)', 'Số Giao Dịch'];
+      const dataNN = listGrouped.map((r, i) => [
+        i + 1,
+        r.ngayHienThi,
+        fmtNum(r.tongTienNgay),
+        r.soLanGiaoDich
+      ]);
+      const tongThangVal = listGrouped.reduce((acc, curr) => acc + curr.tongTienNgay, 0);
+      const tongGD = listGrouped.reduce((acc, curr) => acc + curr.soLanGiaoDich, 0);
+      dataNN.push(['', 'TỔNG CỘNG', fmtNum(tongThangVal), tongGD]);
+
+      const ws1 = XLSX.utils.aoa_to_sheet([headerNN, ...dataNN]);
+      ws1['!cols'] = [{ wch: 5 }, { wch: 18 }, { wch: 22 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, ws1, 'Tổng Hợp Ngày');
+
+      // --- Sheet 2: Tổng Kết ---
+      const wsTK = XLSX.utils.aoa_to_sheet([
+        [`BÁO CÁO CHI TIÊU THÁNG ${thang}/${nam}`],
+        [],
+        ['Chỉ tiêu', 'Giá trị'],
+        ['Tổng Chi Phí', fmtNum(tongThangVal) + ' VND'],
+        ['Tổng Số Ngày Có Giao Dịch', listGrouped.length],
+        ['Tổng Số Giao Dịch', tongGD],
+        [],
+        ['Ngày xuất báo cáo', new Date().toLocaleDateString('vi-VN')]
+      ]);
+      wsTK['!cols'] = [{ wch: 28 }, { wch: 22 }];
+      XLSX.utils.book_append_sheet(wb, wsTK, 'Tổng Kết');
+
+      const fileName = `BaoCao_ChiTieu_Thang${thang}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi khi xuất file Excel!');
+    }
   };
 
   const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
@@ -96,7 +130,7 @@ export default function NguonNhap({ token }) {
         </div>
       </div>
 
-      <NguonNhapForm token={token} onRefresh={handleRefreshAfterSubmit} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} listNames={listNames} onExport={exportCSV} />
+      <NguonNhapForm token={token} onRefresh={handleRefreshAfterSubmit} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} listNames={listNames} onExport={exportExcel} />
       <NguonNhapTable listGrouped={listGrouped} detailList={detailList} selectedNgay={selectedNgay} loadDetailNgay={loadDetailNgay} onEdit={setSelectedItem} onDelete={handleDelete} tongThang={tongThang} formatMoney={formatMoney} />
     </div>
   );

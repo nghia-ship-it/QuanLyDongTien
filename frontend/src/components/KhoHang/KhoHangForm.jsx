@@ -133,7 +133,7 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
           <button type="submit" className="flex-1 bg-amber-600 text-white font-bold p-2 rounded hover:bg-amber-700 transition shadow cursor-pointer">
             {selectedItem ? '✏️ Cập Nhật' : '➕ Nhập Kho'}
           </button>
-          <button type="button" onClick={onExport} className="bg-cyan-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-cyan-700">📤 Xuất CSV</button>
+          <button type="button" onClick={onExport} className="bg-emerald-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-emerald-700">📤 Xuất Excel</button>
           <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
           <button type="button" onClick={() => fileInputRef.current.click()} className="bg-purple-600 text-white font-bold p-2 px-4 rounded shadow hover:bg-purple-700">📥 Nhập Excel</button>
         </div>
