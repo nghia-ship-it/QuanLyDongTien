@@ -39,8 +39,12 @@ export default function LoginForm({ onLoginSuccess, setView }) {
   };
 
   return (
-    <>
-      {error && <p style={{ color: '#b91c1c', backgroundColor: '#fef2f2', padding: '10px', borderRadius: '8px', textAlign: 'center', fontWeight: 'bold', fontSize: '14px' }}>{error}</p>}
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      {error ? (
+        <p style={{ color: '#b91c1c', backgroundColor: '#fef2f2', padding: '10px', borderRadius: '8px', textAlign: 'center', fontWeight: 'bold', fontSize: '14px' }}>
+          {error}
+        </p>
+      ) : null}
       
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
         <input 
@@ -85,7 +89,7 @@ export default function LoginForm({ onLoginSuccess, setView }) {
           onMouseOver={(e) => { if (!isLoading) e.target.style.background = '#1d4ed8' }}
           onMouseOut={(e) => { if (!isLoading) e.target.style.background = '#2563eb' }}
         >
-          {isLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
+          <span>{isLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}</span>
         </button>
       </form>
 
@@ -94,6 +98,6 @@ export default function LoginForm({ onLoginSuccess, setView }) {
           Chưa có tài khoản? <span style={{ color: '#2563eb', textDecoration: 'underline' }}>Đăng ký ngay</span>
         </p>
       </div>
-    </>
+    </div>
   );
 }
