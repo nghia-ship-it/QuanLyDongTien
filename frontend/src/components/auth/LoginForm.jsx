@@ -5,10 +5,12 @@ export default function LoginForm({ onLoginSuccess, setView }) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); 
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     const API_URL = 'https://quanlydongtien.onrender.com/api';
 
     try {
@@ -19,14 +21,20 @@ export default function LoginForm({ onLoginSuccess, setView }) {
       });
       const data = await res.json();
       
-      if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại');
+      if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản hoặc mật khẩu.');
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       onLoginSuccess(data.token);
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Failed to fetch') {
+        setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng hoặc thử lại sau.');
+      } else {
+        setError(err.message);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,11 +80,12 @@ export default function LoginForm({ onLoginSuccess, setView }) {
 
         <button 
           type="submit" 
-          style={{ padding: '14px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', marginTop: '5px', transition: 'background 0.2s' }}
-          onMouseOver={(e) => e.target.style.background = '#1d4ed8'}
-          onMouseOut={(e) => e.target.style.background = '#2563eb'}
+          disabled={isLoading}
+          style={{ padding: '14px', background: isLoading ? '#94a3b8' : '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: '16px', fontWeight: 'bold', marginTop: '5px', transition: 'background 0.2s' }}
+          onMouseOver={(e) => { if (!isLoading) e.target.style.background = '#1d4ed8' }}
+          onMouseOut={(e) => { if (!isLoading) e.target.style.background = '#2563eb' }}
         >
-          Đăng Nhập
+          {isLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
         </button>
       </form>
 
