@@ -8,6 +8,7 @@ export default function Dashboard({ token }) { // <--- HỨNG TOKEN Ở ĐÂY N�
   const [chartData, setChartData] = useState([]);
   
   const [tongDoanhThu, setTongDoanhThu] = useState(0);
+  const [tongDoanhThuNam, setTongDoanhThuNam] = useState(0);
   const [tongChiPhi, setTongChiPhi] = useState(0);
   const [loiNhuan, setLoiNhuan] = useState(0);
 
@@ -26,6 +27,7 @@ export default function Dashboard({ token }) { // <--- HỨNG TOKEN Ở ĐÂY N�
 
       const resDT = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu?thang=${thang}&nam=${nam}`, config);
       const resNN = await axios.get(`https://quanlydongtien.onrender.com/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`, config);
+      const resNam = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu/year?nam=${nam}`, config);
       
       const dtData = resDT.data;
       const nnData = resNN.data;
@@ -34,6 +36,7 @@ export default function Dashboard({ token }) { // <--- HỨNG TOKEN Ở ĐÂY N�
       const thu = dtData.reduce((acc, curr) => acc + curr.tongCong, 0);
       const chi = nnData.reduce((acc, curr) => acc + curr.tongTienNgay, 0);
       setTongDoanhThu(thu);
+      setTongDoanhThuNam(resNam.data.tongDoanhThuNam || 0);
       setTongChiPhi(chi);
       setLoiNhuan(thu - chi);
 
@@ -101,8 +104,11 @@ export default function Dashboard({ token }) { // <--- HỨNG TOKEN Ở ĐÂY N�
       {/* 3 Thẻ Thông số */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow border-l-8 border-emerald-500">
-          <p className="text-gray-500 font-bold mb-1">TỔNG DOANH THU</p>
+          <p className="text-gray-500 font-bold mb-1">TỔNG DOANH THU THÁNG {thang}</p>
           <h3 className="text-3xl font-black text-emerald-600">{formatMoney(tongDoanhThu)}</h3>
+          <p className="text-sm font-semibold text-gray-400 mt-2">
+            Năm {nam}: <span className="text-emerald-500">{formatMoney(tongDoanhThuNam)}</span>
+          </p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow border-l-8 border-red-500">
           <p className="text-gray-500 font-bold mb-1">TỔNG CHI PHÍ (Nguồn nhập)</p>

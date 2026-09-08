@@ -8,6 +8,10 @@ const API_URL = 'https://quanlydongtien.onrender.com/api/doanhthu';
 
 export default function DoanhThu({ token }) { 
   const [list, setList] = useState([]);
+  const [listGrouped, setListGrouped] = useState([]);
+  const [detailList, setDetailList] = useState([]);
+  const [selectedNgay, setSelectedNgay] = useState(null);
+  const [selectedNgayGoc, setSelectedNgayGoc] = useState(null);
   const [thang, setThang] = useState(new Date().getMonth() + 1);
   const [nam, setNam] = useState(new Date().getFullYear());
   const [selectedItem, setSelectedItem] = useState(null);
@@ -22,8 +26,25 @@ export default function DoanhThu({ token }) {
     try {
       const res = await axios.get(`${API_URL}?thang=${thang}&nam=${nam}`, config);
       setList(res.data);
+      const resGrouped = await axios.get(`${API_URL}/grouped?thang=${thang}&nam=${nam}`, config);
+      setListGrouped(resGrouped.data);
+      
+      if (selectedNgayGoc) {
+        loadDetailNgay(selectedNgay, selectedNgayGoc);
+      }
     } catch (err) {
       alert('Lỗi lấy dữ liệu doanh thu!');
+    }
+  };
+
+  const loadDetailNgay = async (ngayHienThi, ngayGoc) => {
+    setSelectedNgay(ngayHienThi);
+    setSelectedNgayGoc(ngayGoc);
+    try {
+      const res = await axios.get(`${API_URL}/detail?ngay=${ngayGoc}`, config);
+      setDetailList(res.data);
+    } catch (err) {
+      alert('Lỗi lấy chi tiết!');
     }
   };
 
@@ -120,7 +141,10 @@ export default function DoanhThu({ token }) {
       />
 
       <DoanhThuTable 
-        list={list} 
+        listGrouped={listGrouped} 
+        detailList={detailList} 
+        selectedNgay={selectedNgay} 
+        loadDetailNgay={loadDetailNgay} 
         onEdit={setSelectedItem} 
         onDelete={handleDelete} 
         formatMoney={formatMoney} 

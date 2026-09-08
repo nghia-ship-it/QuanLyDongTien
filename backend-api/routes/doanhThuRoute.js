@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const { DoanhThu } = require('../models/Database');
 const { verifyToken } = require('../middleware/auth');
 
@@ -22,6 +23,39 @@ router.post('/bulk', verifyToken, async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.get('/grouped', verifyToken, async (req, res) => {
+    try {
+        const { thang, nam } = req.query;
+        const prefix = `${nam}-${thang.toString().padStart(2, '0')}`;
+        const rows = await DoanhThu.aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(req.user._id), ngayNhap: { $regex: `^${prefix}` } } },
+            { $group: { 
+                _id: { $substr: ["$ngayNhap", 0, 10] }, 
+                tongTienNgay: { $sum: "$tongCong" }, 
+                tongTienMat: { $sum: "$tienMat" },
+                tongChuyenKhoan: { $sum: "$chuyenKhoan" },
+                soLanGiaoDich: { $sum: 1 }
+            }},
+            { $sort: { _id: -1 } }
+        ]);
+        res.json(rows.map(r => {
+            const parts = r._id.split('-');
+            return { ngayHienThi: `${parts[2]}/${parts[1]}/${parts[0]}`, ngayGoc: r._id, tongTienNgay: r.tongTienNgay, tongTienMat: r.tongTienMat, tongChuyenKhoan: r.tongChuyenKhoan, soLanGiaoDich: r.soLanGiaoDich };
+        }));
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.get('/detail', verifyToken, async (req, res) => {
+    try {
+        const { ngay } = req.query;
+        const rows = await DoanhThu.find({ userId: req.user._id, ngayNhap: { $regex: `^${ngay}` } }).sort({ ngayNhap: -1 });
+        res.json(rows.map(row => ({
+            id: row._id, ngayNhap: row.ngayNhap, tienMat: row.tienMat || 0,
+            chuyenKhoan: row.chuyenKhoan || 0, tongCong: row.tongCong || 0, ghiChu: row.ghiChu
+        })));
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.get('/', verifyToken, async (req, res) => {
     try {
         const { thang, nam } = req.query;
@@ -31,6 +65,18 @@ router.get('/', verifyToken, async (req, res) => {
             id: row._id, ngayNhap: row.ngayNhap, tienMat: row.tienMat || 0,
             chuyenKhoan: row.chuyenKhoan || 0, tongCong: row.tongCong || 0, ghiChu: row.ghiChu
         })));
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.get('/year', verifyToken, async (req, res) => {
+    try {
+        const { nam } = req.query;
+        const prefix = `${nam}-`;
+        const rows = await DoanhThu.aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(req.user._id), ngayNhap: { $regex: `^${prefix}` } } },
+            { $group: { _id: null, tongDoanhThuNam: { $sum: "$tongCong" } } }
+        ]);
+        res.json({ tongDoanhThuNam: rows.length > 0 ? rows[0].tongDoanhThuNam : 0 });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
