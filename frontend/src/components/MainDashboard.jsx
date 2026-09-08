@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dashboard from './Dashboard';
 import NguonNhap from './NguonNhap/NguonNhap';
 import DoanhThu from './DoanhThu/DoanhThu';
@@ -12,6 +12,27 @@ export default function MainDashboard({ onLogout }) {
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userInfo = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
 
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
@@ -55,7 +76,13 @@ export default function MainDashboard({ onLogout }) {
               {navBtn('huongDan', 'bg-indigo-600 text-white', '⚙️', 'SePay')}
               {navBtn('taiKhoan', 'bg-purple-600 text-white', '👤', 'Tài Khoản')}
               
-              <button onClick={onLogout} className="ml-4 px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 hover:text-red-300 font-bold rounded-lg transition">
+              {deferredPrompt && (
+                <button onClick={handleInstallClick} className="ml-2 px-3 py-2 bg-white/10 text-white border border-white/20 hover:bg-white/20 font-bold rounded-lg transition" title="Tải ứng dụng về máy">
+                  ⬇️ Tải App
+                </button>
+              )}
+
+              <button onClick={onLogout} className="ml-2 px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 hover:text-red-300 font-bold rounded-lg transition">
                 🚪 Đăng xuất
               </button>
             </div>

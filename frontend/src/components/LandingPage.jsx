@@ -1,7 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function LandingPage() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen font-sans overflow-x-hidden">
      {/* Header / Navbar */}
@@ -11,6 +32,11 @@ export default function LandingPage() {
           <h1 className="text-xl md:text-2xl font-extrabold text-emerald-600 tracking-tight">F.L.O.W</h1>
         </div>
         <div className="flex items-center gap-3 md:gap-6">
+          {deferredPrompt && (
+            <button onClick={handleInstallClick} className="hidden sm:flex bg-white/10 text-white border border-white/20 hover:bg-white/20 px-4 py-2 rounded-lg font-medium transition items-center gap-2 text-sm md:text-base">
+              ⬇️ Tải về máy
+            </button>
+          )}
           <Link to="/login" className="text-white hover:text-emerald-600 font-medium transition text-sm md:text-base whitespace-nowrap">
             Đăng nhập
           </Link>
