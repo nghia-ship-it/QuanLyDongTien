@@ -116,7 +116,7 @@ export default function MainDashboard({ onLogout }) {
         {currentTab === 'doanhThu' && <DoanhThu token={token} />}
         {currentTab === 'congNo' && <CongNo token={token} />}
         {currentTab === 'khoHang' && userInfo.loaiTaiKhoan === 'doanh_nghiep' && <KhoHang token={token} />}
-        {currentTab === 'huongDan' && <HuongDanSePay />}
+        {currentTab === 'huongDan' && <HuongDanSePay userInfo={userInfo} />}
         {currentTab === 'taiKhoan' && <TaiKhoan token={token} />}
       </main>
 

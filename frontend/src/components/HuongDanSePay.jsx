@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 
-export default function HuongDanSePay() {
+export default function HuongDanSePay({ userInfo }) {
   const [copied, setCopied] = useState(false);
-  const webhookUrl = `${import.meta.env.VITE_API_URL}/api/webhook/sepay`;
+  
+  // Tránh trường hợp user cũ chưa có webhookToken
+  const tokenUrl = userInfo?.webhookToken ? `/${userInfo.id}/${userInfo.webhookToken}` : '/[Loi_Chua_Co_Token_Vui_Long_Dang_Nhap_Lai]';
+  const webhookUrl = `${import.meta.env.VITE_API_URL}/api/webhook/sepay${tokenUrl}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(webhookUrl);

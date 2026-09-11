@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     phoneNumber: { type: String, default: '' },
     soTaiKhoanBank: { type: String, default: '' }, 
     tenNganHang: { type: String, default: '' },
-    loaiTaiKhoan: { type: String, default: 'ca_nhan' } // ca_nhan hoac doanh_nghiep
+    loaiTaiKhoan: { type: String, default: 'ca_nhan' }, // ca_nhan hoac doanh_nghiep
+    webhookToken: { type: String, default: '' } // Mã bảo mật riêng cho webhook SePay
 });
 const User = mongoose.model('User', userSchema);
 

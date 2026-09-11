@@ -2,23 +2,22 @@ const express = require('express');
 const router = express.Router();
 const { User, DoanhThu } = require('../models/Database');
 
-router.post('/sepay', async (req, res) => {
+router.post('/sepay/:userId/:token', async (req, res) => {
     try {
-        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-        const sepayApiKey = process.env.SEPAY_API_KEY;
-        if (!sepayApiKey || !authHeader || authHeader !== `Apikey ${sepayApiKey}`) {
-            return res.status(401).json({ success: false, message: 'Unauthorized webhook access' });
+        const { userId, token } = req.params;
+
+        // Tìm User có _id và webhookToken khớp
+        const user = await User.findOne({ _id: userId, webhookToken: token });
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Webhook bị từ chối: Sai thông tin bảo mật' });
         }
 
         const data = req.body;
         if (data && data.transferAmount > 0) {
             const tkNhanTien = data.accountNumber; 
-            const user = await User.findOne({ soTaiKhoanBank: tkNhanTien });
-
-            if (!user) {
-                console.log(`⚠️ Có tiền vào tài khoản ${tkNhanTien} nhưng chưa ai đăng ký số này!`);
-                return res.status(200).json({ message: 'Không tìm thấy user khớp với STK' });
-            }
+            
+            // Tùy chọn: Bạn có thể kiểm tra lại số tài khoản ngân hàng xem có đúng không
+            // if (tkNhanTien !== user.soTaiKhoanBank) { ... }
 
             const today = new Date();
             today.setHours(today.getHours() + 7); 

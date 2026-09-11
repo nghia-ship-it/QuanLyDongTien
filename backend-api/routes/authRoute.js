@@ -39,6 +39,8 @@ router.post('/register', async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        const crypto = require('crypto');
+        const webhookToken = crypto.randomBytes(16).toString('hex');
 
         const newUser = new User({ 
             username, 
@@ -46,7 +48,8 @@ router.post('/register', async (req, res) => {
             password: hashedPassword, 
             soTaiKhoanBank, 
             tenNganHang, 
-            loaiTaiKhoan 
+            loaiTaiKhoan,
+            webhookToken
         });
         await newUser.save();
 
@@ -68,6 +71,13 @@ router.post('/login', async (req, res) => {
         if (!secret) return res.status(500).json({ message: 'Lỗi server: Chưa cấu hình TOKEN_SECRET' });
         const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '7d' });
         
+        // Tạo webhookToken nếu user cũ chưa có
+        if (!user.webhookToken) {
+            const crypto = require('crypto');
+            user.webhookToken = crypto.randomBytes(16).toString('hex');
+            await user.save();
+        }
+
         const userInfo = { 
             id: user._id, 
             username: user.username, 
@@ -75,7 +85,8 @@ router.post('/login', async (req, res) => {
             phoneNumber: user.phoneNumber, 
             soTaiKhoanBank: user.soTaiKhoanBank, 
             tenNganHang: user.tenNganHang,
-            loaiTaiKhoan: user.loaiTaiKhoan
+            loaiTaiKhoan: user.loaiTaiKhoan,
+            webhookToken: user.webhookToken
         };
         
         res.json({ token, user: userInfo });
@@ -109,7 +120,8 @@ router.put('/update-profile', verifyToken, async (req, res) => {
             phoneNumber: user.phoneNumber, 
             soTaiKhoanBank: user.soTaiKhoanBank, 
             tenNganHang: user.tenNganHang,
-            loaiTaiKhoan: user.loaiTaiKhoan
+            loaiTaiKhoan: user.loaiTaiKhoan,
+            webhookToken: user.webhookToken
         };
         res.json({ message: 'Cập nhật tài khoản thành công!', user: updatedInfo });
     } catch (err) { res.status(500).json({ error: err.message }); }
