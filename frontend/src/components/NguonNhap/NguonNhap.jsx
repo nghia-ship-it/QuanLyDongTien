@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import NguonNhapForm from './NguonNhapForm';
 import NguonNhapTable from './NguonNhapTable';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/nguonnhap';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/nguonnhap`;
 
 export default function NguonNhap({ token }) {
   const [listGrouped, setListGrouped] = useState([]);

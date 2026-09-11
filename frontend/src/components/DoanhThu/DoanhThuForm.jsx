@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/doanhthu';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/doanhthu`;
 
 export default function DoanhThuForm({ token, onRefresh, selectedItem, clearSelection, onExport }) {
   const [tienMat, setTienMat] = useState('');

@@ -3,8 +3,9 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import KhoHangForm from './KhoHangForm';
 import KhoHangTable from './KhoHangTable';
+import AutocompleteDoiTac from '../AutocompleteDoiTac';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/khohang';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/khohang`;
 
 export default function KhoHang({ token }) {
   const [list, setList] = useState([]);
@@ -79,8 +80,16 @@ export default function KhoHang({ token }) {
     }
   };
 
-  const tongGiaTriKho = list.reduce((acc, curr) => acc + (curr.soLuongTon * curr.giaNhap), 0);
   const formatMoney = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+
+  const [filterDoiTacId, setFilterDoiTacId] = useState(null);
+  const [filterDoiTacName, setFilterDoiTacName] = useState('');
+
+  const filteredList = filterDoiTacId 
+    ? list.filter(item => item.doiTacId && item.doiTacId._id === filterDoiTacId) 
+    : list;
+
+  const tongGiaTriKhoFilter = filteredList.reduce((acc, curr) => acc + (curr.soLuongTon * curr.giaNhap), 0);
 
   return (
     <div className="p-6 bg-transparent min-h-screen">
@@ -92,7 +101,25 @@ export default function KhoHang({ token }) {
       </div>
 
       <KhoHangForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportExcel} />
-      <KhoHangTable list={list} onEdit={setSelectedItem} onDelete={handleDelete} tongGiaTriKho={tongGiaTriKho} formatMoney={formatMoney} />
+      
+      <div className="mb-4 bg-white p-4 rounded-xl shadow border border-amber-100 flex items-center gap-4">
+        <label className="font-semibold text-gray-700 whitespace-nowrap">Lọc theo Nhà Cung Cấp (Đại lý):</label>
+        <div className="w-1/3">
+          <AutocompleteDoiTac 
+            value={filterDoiTacName}
+            onChange={(name, id) => { 
+                setFilterDoiTacName(name); 
+                setFilterDoiTacId(id || null);
+                if (!name) setFilterDoiTacId(null);
+            }}
+            loaiDoiTac="dai_ly"
+            token={token}
+            placeholder="Tất cả đại lý (Xóa để xem tất cả)"
+          />
+        </div>
+      </div>
+
+      <KhoHangTable list={filteredList} onEdit={setSelectedItem} onDelete={handleDelete} tongGiaTriKho={tongGiaTriKhoFilter} formatMoney={formatMoney} />
     </div>
   );
 }

@@ -64,7 +64,9 @@ router.post('/login', async (req, res) => {
         const validPass = await bcrypt.compare(password, user.password);
         if (!validPass) return res.status(400).json({ message: 'Sai mật khẩu!' });
 
-        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET || 'BiMatCuaTao', { expiresIn: '7d' });
+        const secret = process.env.TOKEN_SECRET;
+        if (!secret) return res.status(500).json({ message: 'Lỗi server: Chưa cấu hình TOKEN_SECRET' });
+        const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '7d' });
         
         const userInfo = { 
             id: user._id, 
@@ -121,11 +123,13 @@ router.post('/forgot-password', async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: 'Email này chưa được đăng ký trong hệ thống!' });
 
-        // Tạo token dùng một lần để đổi mật khẩu (hết hạn sau 15 phút)
-        const resetToken = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET || 'BiMatCuaTao', { expiresIn: '15m' });
+        const secret = process.env.TOKEN_SECRET;
+        if (!secret) return res.status(500).json({ message: 'Lỗi server: Chưa cấu hình TOKEN_SECRET' });
+        const resetToken = jwt.sign({ id: user._id }, secret, { expiresIn: '15m' });
 
         // Tạo link để người dùng click vào (Trỏ về Frontend)
-        const resetLink = `https://cashflowvn.vercel.app/reset-password?token=${resetToken}`;
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
         const mailOptions = {
             from: `"SmartBiz SaaS" <${process.env.EMAIL_USER}>`,
@@ -158,7 +162,9 @@ router.post('/reset-password', async (req, res) => {
         if (!token) return res.status(400).json({ message: 'Thiếu vé xác thực!' });
 
         // Giải mã token xem có hợp lệ và còn hạn không
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'BiMatCuaTao');
+        const secret = process.env.TOKEN_SECRET;
+        if (!secret) return res.status(500).json({ message: 'Lỗi server: Chưa cấu hình TOKEN_SECRET' });
+        const verified = jwt.verify(token, secret);
         
         // Tìm user dựa vào ID trong token
         const user = await User.findById(verified.id);

@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import DoanhThuForm from './DoanhThuForm';
 import DoanhThuTable from './DoanhThuTable';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/doanhthu';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/doanhthu`;
 
 export default function DoanhThu({ token }) { 
   const [list, setList] = useState([]);

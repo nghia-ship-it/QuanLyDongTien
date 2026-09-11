@@ -20,6 +20,7 @@ const doanhThuRoute = require('./routes/doanhThuRoute');
 const nguonNhapRoute = require('./routes/nguonNhapRoute');
 const webhookRoute = require('./routes/webhookRoute');
 const congNoRoute = require('./routes/congNoRoute');
+const doiTacRoute = require('./routes/doiTacRoute');
 
 // 3. ĐĂNG KÝ ĐƯỜNG DẪN API
 app.use('/api', authRoute); 
@@ -28,6 +29,7 @@ app.use('/api/nguonnhap', nguonNhapRoute);
 app.use('/api/khohang' ,khoHangRoute);
 app.use('/api/webhook', webhookRoute);
 app.use('/api/congno', congNoRoute);
+app.use('/api/doitac', doiTacRoute);
 
 // 4. CHẠY SERVER
 app.get('/', (req, res) => {

@@ -4,6 +4,12 @@ const { User, DoanhThu } = require('../models/Database');
 
 router.post('/sepay', async (req, res) => {
     try {
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+        const sepayApiKey = process.env.SEPAY_API_KEY;
+        if (!sepayApiKey || !authHeader || authHeader !== `Apikey ${sepayApiKey}`) {
+            return res.status(401).json({ success: false, message: 'Unauthorized webhook access' });
+        }
+
         const data = req.body;
         if (data && data.transferAmount > 0) {
             const tkNhanTien = data.accountNumber; 

@@ -4,14 +4,24 @@ import * as XLSX from 'xlsx';
 import CongNoForm from './CongNoForm';
 import CongNoTable from './CongNoTable';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/congno';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/congno`;
 
 export default function CongNo({ token }) {
   const [list, setList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historyDoiTac, setHistoryDoiTac] = useState(null);
+  const [historyData, setHistoryData] = useState([]);
   const config = { headers: { 'auth-token': token } };
 
   useEffect(() => { fetchData(); }, []);
+
+  const handleViewHistory = (doiTacId, tenDoiTac) => {
+    setHistoryDoiTac(tenDoiTac);
+    const data = list.filter(item => item.doiTacId === doiTacId || (item.tenDoiTac === tenDoiTac && !item.doiTacId));
+    setHistoryData(data);
+    setShowHistoryModal(true);
+  };
 
   const fetchData = async () => {
     try {
@@ -106,7 +116,55 @@ export default function CongNo({ token }) {
         </button>
       </div>
       <CongNoForm token={token} onRefresh={fetchData} selectedItem={selectedItem} clearSelection={() => setSelectedItem(null)} onExport={exportExcel} />
-      <CongNoTable list={list} onEdit={setSelectedItem} onDelete={handleDelete} formatMoney={formatMoney} tongKhachNo={tongKhachNo} tongNoDaiLy={tongNoDaiLy} />
+      <CongNoTable 
+        list={list} 
+        onEdit={setSelectedItem} 
+        onDelete={handleDelete} 
+        formatMoney={formatMoney} 
+        tongKhachNo={tongKhachNo} 
+        tongNoDaiLy={tongNoDaiLy} 
+        onViewHistory={handleViewHistory}
+      />
+
+      {/* Modal Lịch Sử Nợ */}
+      {showHistoryModal && historyDoiTac && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 bg-indigo-600 text-white flex justify-between items-center">
+              <h3 className="font-bold text-lg">Lịch sử công nợ: {historyDoiTac}</h3>
+              <button onClick={() => setShowHistoryModal(false)} className="text-white hover:text-gray-200 text-2xl leading-none">&times;</button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-100 text-gray-700 text-sm font-bold uppercase">
+                    <th className="p-2 border-b">Ngày</th>
+                    <th className="p-2 border-b">Số tiền nợ</th>
+                    <th className="p-2 border-b">Đã trả</th>
+                    <th className="p-2 border-b">Còn lại</th>
+                    <th className="p-2 border-b">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyData.map(h => (
+                    <tr key={h.id} className="border-b hover:bg-gray-50">
+                      <td className="p-2">{h.ngayGhiNo}</td>
+                      <td className="p-2 text-gray-700">{formatMoney(h.soTienNo)}</td>
+                      <td className="p-2 text-emerald-600">{formatMoney(h.soTienDaTra)}</td>
+                      <td className="p-2 text-red-600 font-bold">{formatMoney(h.soTienNo - h.soTienDaTra)}</td>
+                      <td className="p-2 text-sm">{h.trangThai}</td>
+                    </tr>
+                  ))}
+                  {historyData.length === 0 && <tr><td colSpan="5" className="p-4 text-center">Không có dữ liệu.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-4 bg-gray-50 text-right border-t">
+              <button onClick={() => setShowHistoryModal(false)} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-bold">Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

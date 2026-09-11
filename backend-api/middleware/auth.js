@@ -5,7 +5,9 @@ const verifyToken = (req, res, next) => {
     if (!token) return res.status(401).json({ message: 'Không tìm thấy vé thông hành (Access Denied)' });
 
     try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'BiMatCuaTao');
+        const secret = process.env.TOKEN_SECRET;
+        if (!secret) throw new Error('TOKEN_SECRET not configured');
+        const verified = jwt.verify(token, secret);
         req.user = verified;
         next(); 
     } catch (err) {

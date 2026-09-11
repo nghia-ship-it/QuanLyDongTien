@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function CongNoTable({ list, onEdit, onDelete, formatMoney, tongKhachNo, tongNoDaiLy }) {
+export default function CongNoTable({ list, onEdit, onDelete, formatMoney, tongKhachNo, tongNoDaiLy, onViewHistory }) {
   const userInfo = JSON.parse(localStorage.getItem('user') || '{}');
   const isCaNhan = userInfo.loaiTaiKhoan === 'ca_nhan';
   
@@ -52,7 +52,12 @@ export default function CongNoTable({ list, onEdit, onDelete, formatMoney, tongK
                 list.map((item) => (
                   <tr key={item.id} className="hover:bg-orange-50/50 transition">
                     <td className="p-4">
-                      <div className="font-bold text-gray-900 text-lg">{item.tenDoiTac}</div>
+                      <div 
+                        className="font-bold text-indigo-600 hover:text-indigo-800 text-lg cursor-pointer flex items-center gap-1"
+                        onClick={() => onViewHistory(item.doiTacId, item.tenDoiTac)}
+                      >
+                        {item.tenDoiTac} <span className="text-xs">🕒</span>
+                      </div>
                       <div className="mt-1">
                         {item.loaiCongNo === 'khach_no' ? (
                           <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded text-xs font-bold border border-emerald-200">{textBadgeKhachNo}</span>

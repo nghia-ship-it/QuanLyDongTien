@@ -11,7 +11,7 @@ export default function LoginForm({ onLoginSuccess, setView }) {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    const API_URL = 'https://quanlydongtien.onrender.com/api';
+    const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
     try {
       const res = await fetch(`${API_URL}/login`, {

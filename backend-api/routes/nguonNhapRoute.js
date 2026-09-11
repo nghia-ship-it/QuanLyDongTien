@@ -24,7 +24,7 @@ router.get('/detail', verifyToken, async (req, res) => {
     try {
         const { ngay } = req.query;
         const rows = await NguonNhap.find({ userId: req.user._id, ngayNhap: { $regex: `^${ngay}` } }).sort({ ngayNhap: -1 });
-        res.json(rows.map(r => ({ id: r._id, ngayNhap: r.ngayNhap, tenNguon: r.tenNguon, soTien: r.soTien || 0, ghiChu: r.ghiChu })));
+        res.json(rows.map(r => ({ id: r._id, ngayNhap: r.ngayNhap, tenNguon: r.tenNguon, doiTacId: r.doiTacId, soTien: r.soTien || 0, ghiChu: r.ghiChu })));
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -37,8 +37,8 @@ router.get('/names', verifyToken, async (req, res) => {
 
 router.post('/', verifyToken, async (req, res) => {
     try {
-        const { tenNguon, soTien, ghiChu, ngayNhap } = req.body;
-        const nn = new NguonNhap({ userId: req.user._id, tenNguon, soTien, ghiChu, ngayNhap });
+        const { tenNguon, doiTacId, soTien, ghiChu, ngayNhap } = req.body;
+        const nn = new NguonNhap({ userId: req.user._id, tenNguon, doiTacId, soTien, ghiChu, ngayNhap });
         await nn.save();
         res.json({ id: nn._id });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -46,8 +46,8 @@ router.post('/', verifyToken, async (req, res) => {
 
 router.put('/:id', verifyToken, async (req, res) => {
     try {
-        const { tenNguon, soTien, ghiChu, ngayNhap } = req.body;
-        await NguonNhap.findOneAndUpdate({ _id: req.params.id, userId: req.user._id }, { tenNguon, soTien, ghiChu, ngayNhap });
+        const { tenNguon, doiTacId, soTien, ghiChu, ngayNhap } = req.body;
+        await NguonNhap.findOneAndUpdate({ _id: req.params.id, userId: req.user._id }, { tenNguon, doiTacId, soTien, ghiChu, ngayNhap });
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });

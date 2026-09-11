@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import AutocompleteDoiTac from '../AutocompleteDoiTac';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/congno';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/congno`;
 
 export default function CongNoForm({ token, onRefresh, selectedItem, clearSelection, onExport }) {
   const [loaiCongNo, setLoaiCongNo] = useState('khach_no');
   const [tenDoiTac, setTenDoiTac] = useState('');
+  const [doiTacId, setDoiTacId] = useState(null);
   const [soTienNo, setSoTienNo] = useState('');
   const [soTienDaTra, setSoTienDaTra] = useState('');
   const [ngayGhiNo, setNgayGhiNo] = useState(new Date().toISOString().slice(0, 10));
@@ -24,6 +26,7 @@ export default function CongNoForm({ token, onRefresh, selectedItem, clearSelect
     if (selectedItem) {
       setLoaiCongNo(selectedItem.loaiCongNo);
       setTenDoiTac(selectedItem.tenDoiTac);
+      setDoiTacId(selectedItem.doiTacId || null);
       setSoTienNo(selectedItem.soTienNo || '');
       setSoTienDaTra(selectedItem.soTienDaTra || '');
       setNgayGhiNo(selectedItem.ngayGhiNo || new Date().toISOString().slice(0, 10));
@@ -36,7 +39,7 @@ export default function CongNoForm({ token, onRefresh, selectedItem, clearSelect
 
   const resetForm = () => {
     setLoaiCongNo('khach_no');
-    setTenDoiTac(''); setSoTienNo(''); setSoTienDaTra('');
+    setTenDoiTac(''); setDoiTacId(null); setSoTienNo(''); setSoTienDaTra('');
     setNgayGhiNo(new Date().toISOString().slice(0, 10));
     setNgayHenTra(''); setGhiChu('');
   };
@@ -76,7 +79,7 @@ export default function CongNoForm({ token, onRefresh, selectedItem, clearSelect
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
-      loaiCongNo, tenDoiTac: tenDoiTac.trim(), soTienNo: Number(soTienNo) || 0,
+      loaiCongNo, tenDoiTac: tenDoiTac.trim(), doiTacId, soTienNo: Number(soTienNo) || 0,
       soTienDaTra: Number(soTienDaTra) || 0, ngayGhiNo, ngayHenTra, ghiChu: ghiChu.trim()
     };
     if (!payload.tenDoiTac) return alert('Vui lòng nhập tên đối tác!');
@@ -104,9 +107,15 @@ export default function CongNoForm({ token, onRefresh, selectedItem, clearSelect
             <option value="no_dai_ly">Mình Nợ Người Ta (Phải Trả)</option>
           </select>
         </div>
-        <div className="md:col-span-1">
+        <div className="md:col-span-1 relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">Tên Người Nợ / Chủ Nợ:</label>
-          <input type="text" value={tenDoiTac} onChange={(e) => setTenDoiTac(e.target.value)} placeholder="Nhập tên..." className="w-full border rounded p-2 font-semibold outline-none" required />
+          <AutocompleteDoiTac 
+            value={tenDoiTac}
+            onChange={(name, id) => { setTenDoiTac(name); setDoiTacId(id); }}
+            loaiDoiTac={loaiCongNo === 'khach_no' ? 'khach_hang' : 'dai_ly'}
+            token={token}
+            placeholder="Tìm đối tác hoặc nhập mới..."
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Số Tiền Nợ (VND):</label>

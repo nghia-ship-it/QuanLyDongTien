@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import AutocompleteDoiTac from '../AutocompleteDoiTac';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/nguonnhap';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/nguonnhap`;
 
 export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSelection, listNames, onExport }) {
   const [tenNguon, setTenNguon] = useState('');
+  const [doiTacId, setDoiTacId] = useState(null);
   const [soTien, setSoTien] = useState('');
   const [ghiChu, setGhiChu] = useState('');
   const [ngayNhap, setNgayNhap] = useState(new Date().toISOString().slice(0, 16));
@@ -17,6 +19,7 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
   useEffect(() => {
     if (selectedItem) {
       setTenNguon(selectedItem.tenNguon);
+      setDoiTacId(selectedItem.doiTacId || null);
       const st = Number(selectedItem.soTien) || 0;
       setSoTien(st > 0 ? st.toLocaleString('vi-VN') : '');
       setGhiChu(selectedItem.ghiChu || '');
@@ -30,6 +33,7 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
 
   const resetForm = () => {
     setTenNguon('');
+    setDoiTacId(null);
     setSoTien('');
     setGhiChu('');
     setNgayNhap(new Date().toISOString().slice(0, 16));
@@ -134,6 +138,7 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
 
     const payload = {
       tenNguon: tenNguon.trim(),
+      doiTacId: doiTacId,
       soTien: rawST,
       ghiChu: ghiChu.trim(),
       ngayNhap: ngayNhap.replace('T', ' ') + ':00'
@@ -159,20 +164,15 @@ export default function NguonNhapForm({ token, onRefresh, selectedItem, clearSel
           <label className="block text-sm font-medium text-gray-700 mb-1">Ngày giờ:</label>
           <input type="datetime-local" value={ngayNhap} onChange={(e) => setNgayNhap(e.target.value)} className="w-full border rounded p-2 focus:ring-1 focus:ring-blue-500" required />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tên nguồn nhập:</label>
-          <input
-            type="text"
-            list="danhSachTenNguon"
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Tên nguồn nhập (Đại lý/Chi phí):</label>
+          <AutocompleteDoiTac 
             value={tenNguon}
-            onChange={(e) => setTenNguon(e.target.value)}
-            placeholder="Ví dụ: Đại lý A, Bán lẻ..."
-            className="w-full border rounded p-2 focus:ring-1 focus:ring-blue-500 font-semibold"
-            required
+            onChange={(name, id) => { setTenNguon(name); setDoiTacId(id); }}
+            loaiDoiTac="dai_ly"
+            token={token}
+            placeholder="Tìm đại lý hoặc nhập mới..."
           />
-          <datalist id="danhSachTenNguon">
-            {listNames.map((name, index) => <option key={index} value={name} />)}
-          </datalist>
         </div>
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">Số tiền (VND):</label>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import AutocompleteDoiTac from '../AutocompleteDoiTac';
 
-const API_URL = 'https://quanlydongtien.onrender.com/api/khohang';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/khohang`;
 
 export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelection, onExport }) {
   const [tenSanPham, setTenSanPham] = useState('');
+  const [tenNhaCungCap, setTenNhaCungCap] = useState('');
+  const [doiTacId, setDoiTacId] = useState(null);
   const [soLuongTon, setSoLuongTon] = useState('');
   const [donViTinh, setDonViTinh] = useState('Cái');
   const [giaNhap, setGiaNhap] = useState('');
@@ -18,6 +21,9 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
   useEffect(() => {
     if (selectedItem) {
       setTenSanPham(selectedItem.tenSanPham);
+      // Giả sử có populate doiTacId, hoặc có field tenNhaCungCap trả về
+      setTenNhaCungCap(selectedItem.doiTacId ? selectedItem.doiTacId.tenDoiTac || '' : '');
+      setDoiTacId(selectedItem.doiTacId ? selectedItem.doiTacId._id || selectedItem.doiTacId : null);
       setSoLuongTon(selectedItem.soLuongTon ? selectedItem.soLuongTon.toLocaleString('vi-VN') : '0');
       setDonViTinh(selectedItem.donViTinh || 'Cái');
       setGiaNhap(selectedItem.giaNhap ? selectedItem.giaNhap.toLocaleString('vi-VN') : '0');
@@ -30,6 +36,8 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
 
   const resetForm = () => {
     setTenSanPham('');
+    setTenNhaCungCap('');
+    setDoiTacId(null);
     setSoLuongTon('');
     setDonViTinh('Cái');
     setGiaNhap('');
@@ -78,6 +86,7 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
     e.preventDefault();
     const payload = {
       tenSanPham: tenSanPham.trim(),
+      doiTacId: doiTacId,
       soLuongTon: parseFloat(soLuongTon.replace(/\./g, '')) || 0,
       donViTinh: donViTinh,
       giaNhap: parseFloat(giaNhap.replace(/\./g, '')) || 0,
@@ -103,7 +112,17 @@ export default function KhoHangForm({ token, onRefresh, selectedItem, clearSelec
   return (
     <div className="bg-white p-5 rounded-xl shadow border border-amber-100 mb-6">
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 relative">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Nhà cung cấp (Đại lý):</label>
+          <AutocompleteDoiTac 
+            value={tenNhaCungCap}
+            onChange={(name, id) => { setTenNhaCungCap(name); setDoiTacId(id); }}
+            loaiDoiTac="dai_ly"
+            token={token}
+            placeholder="Tìm đại lý..."
+          />
+        </div>
+        <div className="md:col-span-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">Tên Hàng Hóa / Sản phẩm:</label>
           <input type="text" value={tenSanPham} onChange={(e) => setTenSanPham(e.target.value)} placeholder="Nhập tên hàng..." className="w-full border rounded p-2 focus:ring-1 focus:ring-amber-500 font-semibold" required />
         </div>

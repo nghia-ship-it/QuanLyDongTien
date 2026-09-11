@@ -33,7 +33,7 @@ export default function TaiKhoan({ token }) {
     };
 
     try {
-      const res = await fetch('https://quanlydongtien.onrender.com/api/update-profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/update-profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'auth-token': token },
         body: JSON.stringify(payload)

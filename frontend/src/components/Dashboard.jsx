@@ -25,9 +25,9 @@ export default function Dashboard({ token }) { // <--- HỨNG TOKEN Ở ĐÂY N�
         }
       };
 
-      const resDT = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu?thang=${thang}&nam=${nam}`, config);
-      const resNN = await axios.get(`https://quanlydongtien.onrender.com/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`, config);
-      const resNam = await axios.get(`https://quanlydongtien.onrender.com/api/doanhthu/year?nam=${nam}`, config);
+      const resDT = await axios.get(`${import.meta.env.VITE_API_URL}/api/doanhthu?thang=${thang}&nam=${nam}`, config);
+      const resNN = await axios.get(`${import.meta.env.VITE_API_URL}/api/nguonnhap/grouped?thang=${thang}&nam=${nam}`, config);
+      const resNam = await axios.get(`${import.meta.env.VITE_API_URL}/api/doanhthu/year?nam=${nam}`, config);
       
       const dtData = resDT.data;
       const nnData = resNN.data;

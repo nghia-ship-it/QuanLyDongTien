@@ -6,9 +6,11 @@ const { verifyToken } = require('../middleware/auth');
 // Lấy danh sách hàng hóa trong kho
 router.get('/', verifyToken, async (req, res) => {
     try {
-        const rows = await KhoHang.find({ userId: req.user._id }).sort({ ngayCapNhat: -1 });
+        const rows = await KhoHang.find({ userId: req.user._id })
+            .populate('doiTacId', 'tenDoiTac')
+            .sort({ ngayCapNhat: -1 });
         res.json(rows.map(r => ({
-            id: r._id, tenSanPham: r.tenSanPham, soLuongTon: r.soLuongTon,
+            id: r._id, tenSanPham: r.tenSanPham, soLuongTon: r.soLuongTon, doiTacId: r.doiTacId,
             donViTinh: r.donViTinh, giaNhap: r.giaNhap, giaBan: r.giaBan, ngayCapNhat: r.ngayCapNhat
         })));
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -17,8 +19,8 @@ router.get('/', verifyToken, async (req, res) => {
 // Thêm mặt hàng mới
 router.post('/', verifyToken, async (req, res) => {
     try {
-        const { tenSanPham, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat } = req.body;
-        const kh = new KhoHang({ userId: req.user._id, tenSanPham, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat });
+        const { tenSanPham, doiTacId, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat } = req.body;
+        const kh = new KhoHang({ userId: req.user._id, tenSanPham, doiTacId, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat });
         await kh.save();
         res.json({ id: kh._id });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -27,9 +29,9 @@ router.post('/', verifyToken, async (req, res) => {
 // Cập nhật (Nhập thêm / Xuất bớt)
 router.put('/:id', verifyToken, async (req, res) => {
     try {
-        const { tenSanPham, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat } = req.body;
+        const { tenSanPham, doiTacId, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat } = req.body;
         await KhoHang.findOneAndUpdate({ _id: req.params.id, userId: req.user._id }, 
-            { tenSanPham, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat });
+            { tenSanPham, doiTacId, soLuongTon, donViTinh, giaNhap, giaBan, ngayCapNhat });
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });

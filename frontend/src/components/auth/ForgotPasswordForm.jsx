@@ -12,7 +12,7 @@ export default function ForgotPasswordForm({ setView }) {
     setError('');
     setIsLoading(true); // Bắt đầu quay vòng vòng
 
-    const API_URL = 'https://quanlydongtien.onrender.com/api';
+    const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
     try {
       // Bắn cục data chứa email lên API /forgot-password

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 export default function HuongDanSePay() {
   const [copied, setCopied] = useState(false);
-  const webhookUrl = "https://quanlydongtien.onrender.com/api/webhook/sepay";
+  const webhookUrl = `${import.meta.env.VITE_API_URL}/api/webhook/sepay`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(webhookUrl);

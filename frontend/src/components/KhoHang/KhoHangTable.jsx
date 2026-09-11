@@ -8,6 +8,7 @@ export default function KhoHangTable({ list, onEdit, onDelete, tongGiaTriKho, fo
           <thead>
             <tr className="bg-[#f59e0b] text-white text-sm font-bold uppercase">
               <th className="p-3">Tên Sản Phẩm</th>
+              <th className="p-3">Đại lý/NCC</th>
               <th className="p-3 text-center">Tồn Kho</th>
               <th className="p-3">Giá Nhập</th>
               <th className="p-3">Giá Bán</th>
@@ -17,11 +18,12 @@ export default function KhoHangTable({ list, onEdit, onDelete, tongGiaTriKho, fo
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-700">
             {list.length === 0 ? (
-              <tr><td colSpan="6" className="p-4 text-center text-gray-400">Kho đang trống.</td></tr>
+              <tr><td colSpan="7" className="p-4 text-center text-gray-400">Kho đang trống.</td></tr>
             ) : (
               list.map((item) => (
                 <tr key={item.id} className="hover:bg-amber-50 transition">
                   <td className="p-3 font-bold text-gray-800">{item.tenSanPham}</td>
+                  <td className="p-3 text-sm font-medium text-gray-600">{item.doiTacId ? item.doiTacId.tenDoiTac : '---'}</td>
                   <td className="p-3 text-center font-black text-blue-600">
                     {item.soLuongTon} <span className="text-xs font-normal text-gray-500">{item.donViTinh}</span>
                   </td>

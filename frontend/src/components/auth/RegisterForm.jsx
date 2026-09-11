@@ -15,7 +15,7 @@ export default function RegisterForm({ setView }) {
     e.preventDefault();
     setError('');
     setMessage('');
-    const API_URL = 'https://quanlydongtien.onrender.com/api';
+    const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
     try {
       const res = await fetch(`${API_URL}/register`, {
