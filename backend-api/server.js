@@ -2,7 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const khoHangRoute = require('./routes/khoHangRoute')
+const khoHangRoute = require('./routes/khoHangRoute');
+const doiTacRoute = require('./routes/doiTacRoute');
+const dashboardRoute = require('./routes/dashboardRoute');
 
 const app = express();
 app.use(cors());
@@ -30,6 +32,7 @@ app.use('/api/khohang' ,khoHangRoute);
 app.use('/api/webhook', webhookRoute);
 app.use('/api/congno', congNoRoute);
 app.use('/api/doitac', doiTacRoute);
+app.use('/api/dashboard', dashboardRoute);
 
 // 4. CHẠY SERVER
 app.get('/', (req, res) => {
