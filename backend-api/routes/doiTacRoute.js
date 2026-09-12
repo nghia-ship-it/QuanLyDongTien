@@ -16,7 +16,7 @@ router.get('/search', verifyToken, async (req, res) => {
             filter.loaiDoiTac = loai;
         }
 
-        const results = await DoiTac.find(filter).limit(10).sort({ tenDoiTac: 1 });
+        const results = await DoiTac.find(filter).sort({ tenDoiTac: 1 });
         res.json(results.map(r => ({ id: r._id, tenDoiTac: r.tenDoiTac, loaiDoiTac: r.loaiDoiTac, soDienThoai: r.soDienThoai })));
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
