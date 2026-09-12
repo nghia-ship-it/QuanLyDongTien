@@ -7,12 +7,10 @@ const { verifyToken } = require('../middleware/auth');
 router.get('/search', verifyToken, async (req, res) => {
     try {
         const { query, loai } = req.query; // loai: 'dai_ly' | 'khach_hang'
-        if (!query) return res.json([]);
-        
-        let filter = {
-            userId: req.user._id,
-            tenDoiTac: { $regex: new RegExp(query, 'i') } // Tìm kiếm không phân biệt hoa thường
-        };
+        let filter = { userId: req.user._id };
+        if (query) {
+            filter.tenDoiTac = { $regex: new RegExp(query, 'i') };
+        }
         
         if (loai) {
             filter.loaiDoiTac = loai;

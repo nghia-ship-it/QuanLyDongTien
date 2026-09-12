@@ -60,20 +60,33 @@ export default function AutocompleteDoiTac({ value, onChange, placeholder, loaiD
 
     return (
         <div ref={wrapperRef} className="relative w-full">
-            <input
-                type="text"
-                value={query}
-                onChange={handleInputChange}
-                onFocus={() => {
-                    if (query.length > 0) {
+            <div className="relative">
+                <input
+                    type="text"
+                    value={query}
+                    onChange={handleInputChange}
+                    onFocus={() => {
                         setShowDropdown(true);
                         fetchSuggestions(query);
-                    }
-                }}
-                placeholder={placeholder || 'Nhập tên đối tác...'}
-                className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500"
-                required
-            />
+                    }}
+                    placeholder={placeholder || 'Nhập tên đối tác...'}
+                    className="w-full border rounded-lg p-2 pr-8 focus:ring-2 focus:ring-indigo-500"
+                    required
+                />
+                <button
+                    type="button"
+                    onClick={() => {
+                        const newShow = !showDropdown;
+                        setShowDropdown(newShow);
+                        if (newShow) fetchSuggestions(query);
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                </button>
+            </div>
             {showDropdown && suggestions.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border border-gray-200 mt-1 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {suggestions.map((dt) => (
