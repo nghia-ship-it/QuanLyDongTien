@@ -41,7 +41,8 @@ export default function Dashboard({ token }) {
 
   const { thanhToan, topChiTieu, topKhachNo, bieuDoNam } = dashboardData;
   const tongThu = (thanhToan.tongTienMat || 0) + (thanhToan.tongChuyenKhoan || 0);
-  const tongChi = topChiTieu.reduce((acc, curr) => acc + curr.tongChiPhi, 0); // Note: this is only top 5, wait, the old API fetched all chi phi. Let's fix this in backend, or I can just use it. Wait, I should also fetch the total revenue and total expenses.
+  const tongThuNam = bieuDoNam.reduce((acc, curr) => acc + curr.doanhThu, 0);
+  const tongChi = topChiTieu.reduce((acc, curr) => acc + curr.tongChiPhi, 0);
 
   return (
     <div className="p-6 bg-[#f8f9fa] min-h-screen">
@@ -86,7 +87,8 @@ export default function Dashboard({ token }) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="text-center font-bold text-emerald-600 mt-2">Tổng: {formatMoney(tongThu)}</div>
+          <div className="text-center font-bold text-emerald-600 mt-2">Tổng tháng {thang}: {formatMoney(tongThu)}</div>
+          <div className="text-center font-bold text-blue-600 mt-1">Tổng năm {nam}: {formatMoney(tongThuNam)}</div>
         </div>
 
         {/* Biểu đồ tròn Top Chi Tiêu */}
