@@ -22,7 +22,6 @@ const doanhThuRoute = require('./routes/doanhThuRoute');
 const nguonNhapRoute = require('./routes/nguonNhapRoute');
 const webhookRoute = require('./routes/webhookRoute');
 const congNoRoute = require('./routes/congNoRoute');
-const doiTacRoute = require('./routes/doiTacRoute');
 
 // 3. ĐĂNG KÝ ĐƯỜNG DẪN API
 app.use('/api', authRoute); 
