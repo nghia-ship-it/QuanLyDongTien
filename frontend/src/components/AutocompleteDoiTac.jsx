@@ -24,10 +24,7 @@ export default function AutocompleteDoiTac({ value, onChange, placeholder, loaiD
     }, [wrapperRef]);
 
     const fetchSuggestions = async (searchTerm) => {
-        if (!searchTerm) {
-            setSuggestions([]);
-            return;
-        }
+        const term = searchTerm || '';
         try {
             const API_URL = `${import.meta.env.VITE_API_URL}/api/doitac/search?query=${encodeURIComponent(searchTerm)}&loai=${loaiDoiTac}`;
             const res = await fetch(API_URL, {
@@ -44,12 +41,8 @@ export default function AutocompleteDoiTac({ value, onChange, placeholder, loaiD
         const val = e.target.value;
         setQuery(val);
         onChange(val); // Vẫn truyền tên string về component cha
-        if (val.length > 0) {
-            setShowDropdown(true);
-            fetchSuggestions(val);
-        } else {
-            setShowDropdown(false);
-        }
+        setShowDropdown(true);
+        fetchSuggestions(val);
     };
 
     const handleSelect = (doiTac) => {
